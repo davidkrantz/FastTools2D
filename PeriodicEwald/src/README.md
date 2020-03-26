@@ -9,7 +9,7 @@ In principle, compiling should be just running the cmake script to create the ma
 
 ## MAC OS Mojave
 
-Here you have to make sure that gcc g++ are called instead of clang. I also had to manually add the paths to the GNU scientific library.
+Here you have to make sure that gcc and g++ are called instead of clang. I also had to manually add the include and library directories to help the compiler find the GNU scientific library.
 
 	export CPATH=/usr/local/include/
 	export LIBRARY_PATH=/usr/local/lib/
