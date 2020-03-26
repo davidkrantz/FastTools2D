@@ -1,0 +1,8 @@
+*.cmake
+*.mat
+*.txt
+PeriodicEwald/src/bin/*
+PeriodicEwald/src/CMakeFiles/*
+PeriodicEwald/src/Makefile
+PeriodicEwald/src/mex/Makefile
+PeriodicEwald/src/CMakeFiles/*
