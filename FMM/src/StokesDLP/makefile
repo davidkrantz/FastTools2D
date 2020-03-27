@@ -1,15 +1,16 @@
-MEX=/share/apps/matlab/r2011b/bin/mex
+MEX=/opt/matlab/r2018a/bin/mex
 #MEX=/share/apps/matlab/r2013a/bin/mex
 #location of mex compiler on ronaldo
 
-FORTRAN = ifort
-FFLAGS = -c -fpic -openmp -O3
+FORTRAN = gfortran
+FFLAGS = -c -fpic -fopenmp -O3
 #LIB = -L/share/apps/intel/Compiler/12.1/mkl/lib/intel64 -lmkl_blas95_lp64
 
-MEXLIBDIR = /share/apps/intel/Compiler/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64/
+#MEXLIBDIR = /share/apps/intel/Compiler/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64/
 #MEXLIBDIR = /share/apps/intel/Compiler/13.1/composer_xe_2013/lib/intel64
 #for Ronaldo
-MEXLIB = -lifcore -lirc -lsvml -limf -lgfortran -liomp5 
+#MEXLIB = -lifcore -lirc -lsvml -limf -lgfortran -liomp5
+MEXLIB = -lgomp
 
 OBJS=\
 lfmm2dpart.o\
@@ -26,9 +27,10 @@ stokesDLP.o
 all: cfmm2dpart d2mtreeplot d2tstrcr_omp l2dterms laprouts2d lfmm2drouts lfmm2dpart prini rfmm2dpart stokesDLP mex
 
 mex: stokesDLPfmm.F $(OBJS) 
-	$(MEX) -O stokesDLPfmm.F $(OBJS) -L $(MEXLIBDIR) $(MEXLIB)
+	$(MEX) -O stokesDLPfmm.F $(OBJS) $(MEXLIB)
+	#$(MEX) -O stokesDLPfmm.F $(OBJS) -L $(MEXLIBDIR) $(MEXLIB)
 	#$(MEX) -O -v FC="ifort" stokesDLPfmm.F $(OBJS) -L $(MEXLIBDIR) $(MEXLIB)
-
+	
 cfmm2dpart: cfmm2dpart.f
 	$(FORTRAN) $(FFLAGS) cfmm2dpart.f
 
