@@ -1,6 +1,7 @@
 .DS_Store
 *.cmake
 *.mat
+*.o
 PeriodicEwald/src/bin/*
 PeriodicEwald/src/CMakeFiles/*
 PeriodicEwald/src/Makefile
