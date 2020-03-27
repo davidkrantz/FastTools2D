@@ -2,6 +2,7 @@
 *.cmake
 *.mat
 *.o
+*.mexa64
 PeriodicEwald/src/bin/*
 PeriodicEwald/src/CMakeFiles/*
 PeriodicEwald/src/Makefile
