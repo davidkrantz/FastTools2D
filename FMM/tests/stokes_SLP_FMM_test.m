@@ -1,4 +1,6 @@
 % Test the FMM for stokes SLP
+clearvars
+close all
 addpath('../src/StokesSLP');
 
 %% Set up data
@@ -60,10 +62,10 @@ for i = 1:length(iprec)
         srcEqualsTar,iprec(i));
     
     t = toc;
-    e = max(abs(ufmm - udirect));
+    e = max(abs(ufmm + 1i*vfmm - (udirect+1i*vdirect)));
     
     disp(['FMM with iprec ', num2str(iprec(i)), ' took ', num2str(t),...
-        ' seconds. L-infinity error: ', num2str(e)]);
+        ' seconds. Maximum error: ', num2str(e)]);
     
 end
 
