@@ -2,6 +2,8 @@
 *.cmake
 *.mat
 *.o
+*.out
+*~
 *.mexa64
 PeriodicEwald/src/bin/*
 PeriodicEwald/src/CMakeFiles/*
@@ -9,3 +11,5 @@ PeriodicEwald/src/Makefile
 PeriodicEwald/src/CMakeCache.txt
 PeriodicEwald/src/mex/Makefile
 PeriodicEwald/src/mex/CMakeFiles/*
+FMM/src/StokesSLP/lib/*
+FMM/src/StokesSLP/penmp
