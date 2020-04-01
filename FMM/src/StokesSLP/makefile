@@ -1,12 +1,9 @@
-MEX=/Applications/MATLAB_R2019a.app/bin/mex
+MEX=/opt/matlab/r2018a/bin/mex
 
-FORTRAN = gfortran-9
-FFLAGS = -c -fpic -fopenmp -O3
-#FFLAGS = -c -fpic -O3
-
-#MEXLIBDIR = /Applications/MATLAB_R2019a.app/bin/maci64/:/Applications/MATLAB_R2019a.app/sys/os/maci64/
-#MEXLIB = -libifcore -libirc -libsvml -libimf -libgfortran -libiomp5 
-MEXLIB = -lgomp
+FORTRAN = gfortran
+FFLAGS = -c -fpic -fopenmp -O3 -Wall -largeArrayDims -fdefault-real-8 -fdefault-double-8
+MEXLIBDIR = /opt/matlab/r2018a/sys/os/glnxa64
+MEXLIB = -lgfortran -liomp5 -lirc -lsvml -limf 
 
 OBJS=\
 lfmm2drouts.o\
@@ -22,7 +19,7 @@ stokesSLP.o
 all: cfmm2dpart d2mtreeplot d2tstrcr_omp l2dterms laprouts2d lfmm2drouts prini rfmm2dpart stokesSLP mex
 
 mex: stokesSLPfmm.F $(OBJS) 
-	$(MEX) -O stokesSLPfmm.F $(OBJS) $(MEXLIB)
+	$(MEX) -v -O stokesSLPfmm.F $(OBJS) -L$(MEXLIBDIR) $(MEXLIB)
 
 cfmm2dpart: cfmm2dpart.f
 	$(FORTRAN) $(FFLAGS) cfmm2dpart.f
