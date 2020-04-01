@@ -1,7 +1,7 @@
 MEX=/opt/matlab/r2018a/bin/mex
 
 FORTRAN = gfortran
-FFLAGS = -c -fpic -fopenmp -O3 -Wall -largeArrayDims -fdefault-real-8 -fdefault-double-8
+FFLAGS = -c -fpic -fopenmp -Wall -O3 -fdefault-real-8 -fdefault-double-8
 MEXLIBDIR = /opt/matlab/r2018a/sys/os/glnxa64
 MEXLIB = -lgfortran -liomp5 -lirc -lsvml -limf 
 
