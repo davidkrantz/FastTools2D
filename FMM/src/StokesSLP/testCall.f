@@ -1,7 +1,9 @@
       program testCall
+      
+
       implicit real*8 (a-h,o-z)
 
-      parameter (ns = 2**24)
+      parameter (ns = 2**10)
       parameter (nt = ns)
 
       dimension xs(ns),ys(ns)
@@ -14,7 +16,12 @@
 
       twopi = 8.d0*datan(1.d0)
 
+      write(*,*) "Starting test program..."
+
       dx = twopi/dble(ns)
+      write(*,*) 'ns = ', ns
+      write(*,*) 'dx = ', dx
+
       do i=1,ns
         theta = dble(i-1)*dx
         xs(i) = dcos(theta)
@@ -28,37 +35,37 @@
         xt(i) = dcos(theta) + 2.d0
         yt(i) = dsin(theta) + 1.d0
       enddo
-
+	
+      write(*,*) 'Calling FMM...'
       call system_clock(iclock1)
-      call stokesSLP(q1,q2,xs,ys,ns,xs,ys,ns,1.d0,4.d0,u1,u2)
+      call stokesSLP(q1,q2,xs,ys,ns,xs,ys,ns,1.d0,6.d0,u1,u2)
       call system_clock(iclock2,irate)
-      write(6,*) '***********'
-      write(6,*) 'FMM CPU TIME IS'
-      write(6,1000) real(iclock2 - iclock1)/real(irate)
-      write(6,*) '***********'
+      write(*,*) '***********'
+      write(*,*) 'FMM CPU TIME IS'
+      write(*,1000) real(iclock2 - iclock1)/real(irate)
+      write(*,*) '***********'
 
+      write(*,*) 'Calling direct sum...'
+      call system_clock(iclock1)
+      call stokesSLPdirect(q1,q2,xs,ys,ns,xs,ys,ns,1,u1Exact,u2Exact)
+      call system_clock(iclock2,irate)
+      write(*,*) '***********'
+      write(*,*) 'DIRECT CPU TIME IS'
+      write(*,1000) real(iclock2 - iclock1)/real(irate)
+      write(*,*) '***********'
 
-c      call system_clock(iclock1)
-c      call stokesSLPdirect(q1,q2,xs,ys,ns,xs,ys,ns,1,u1Exact,u2Exact)
-c      call system_clock(iclock2,irate)
-c      write(6,*) '***********'
-c      write(6,*) 'DIRECT CPU TIME IS'
-c      write(6,1000) real(iclock2 - iclock1)/real(irate)
-c      write(6,*) '***********'
-c
-c      r_err = 0.d0
-c      c_err = 0.d0
-c      do i = 1,ns
-c        r_err = r_err + (u1(i) - u1Exact(i))**2
-c        c_err = c_err + (u2(i) - u2Exact(i))**2
-c      enddo
-c      write(6,*) '***********'
-c      write(6,*) 'COMPONENT 1 ERROR'
-c      write(6,1000) r_err
-c      write(6,*) 'COMPONENT 2 ERROR'
-c      write(6,1000) c_err
-c      write(6,*) '***********'
-
+      r_err = 0.d0
+      c_err = 0.d0
+      do i = 1,ns
+        r_err = r_err + (u1(i) - u1Exact(i))**2
+        c_err = c_err + (u2(i) - u2Exact(i))**2
+      enddo
+      write(*,*) '***********'
+      write(*,*) 'COMPONENT 1 ERROR'
+      write(*,1000) r_err
+      write(*,*) 'COMPONENT 2 ERROR'
+      write(*,1000) c_err
+      write(*,*) '***********'
 
 
 
