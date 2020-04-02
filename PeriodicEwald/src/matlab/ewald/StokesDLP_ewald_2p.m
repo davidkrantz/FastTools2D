@@ -1,16 +1,19 @@
-function [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, varargin)
+function [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-% Spectral Ewald evaluation of the doubly-periodic Stokeslet.
+% Spectral Ewald evaluation of the doubly-periodic  double-layer potential.
 %
 % Input:
 %       xsrc, x component of source points
 %       ytar, y component of source points 
 %       xsrc, x component of target points
 %       ytar, y component of target points 
+%       n1, x component of the normal vector at source points
+%       n2, y component of the normal vector at source points
 %       f1, x component of density function
 %       f2, y component of density function
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
+%       vargargin can contain any or all of the following:
 %         'P', integer giving support points in each direction (default 24)
 %         'Nb', average number of points per box (default 9)
 %         'tol', error tolerance for truncation of sums (default 1e-16)
@@ -53,7 +56,7 @@ end
 
 if verbose
     fprintf("*********************************************************\n");
-    fprintf("SPECTRAL EWALD FOR THE STOKES SINGLE-LAYER POTENTIAL\n\n")
+    fprintf("SPECTRAL EWALD FOR THE STOKES DOUBLE-LAYER POTENTIAL\n\n")
     fprintf("NUMBER OF SOURCES: %d\n", length(xsrc));
     fprintf("NUMBER OF TARGETS: %d\n", length(xtar));
     fprintf("TOLERANCE: %3.3e\n", tol);
@@ -70,6 +73,7 @@ ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 psrc = [xsrc';ysrc'];
 ptar = [xtar';ytar'];
 f = [f1';f2'];
+n = [n1';n2'];
 
 % compute parameters, rc, xi and kinf
 [A,B] = rat(Lx/Ly);
@@ -107,27 +111,29 @@ if verbose
     tic
 end
 
-%Self-term integrated into the real sum
-ureal = mex_stokes_slp_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
+ureal = mex_stokes_dlp_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
     tic
 end
 
-uk = mex_stokes_slp_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
+uk = mex_stokes_dlp_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
+% Fourier space part needs to be scaled by L/2*pi to work for arbitrary L
+uk = (-1/(Lx*Ly)*uk)*Lx*Ly/(2*pi)^2;
+
 u = ureal + uk;
+
 u1 = u(1,:);
 u2 = u(2,:);
 
 end
-
 
 %% Computing error estimates. Estimates come from Pålsson and Tornberg 2019 
 % https://arxiv.org/pdf/1909.12581.pdf
@@ -141,14 +147,13 @@ function k = find_kinfb(Q,Lx,Ly,xi,tol)
 k = round(5*xi);       % Initial guess
 maxit = 1e2; it = 0;
 
-f = @(k) sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3*k))*exp(-k^2/(4*xi^2)) - tol;
-fp = @(k) -sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3))*exp(-k^2/(4*xi^2))*...
-                (0.5*k^(-1.5) + sqrt(1/k)*2*k/(4*xi^2));
+f = @(k) sqrt(k*8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2)) - tol;
+fp = @(k) sqrt(8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2))*(0.5*k^(-1/2) - 2*k^(3/2)/(4*xi^2));
 
 kdiff = 1;
 while abs(kdiff) > 1e-2
     if it > maxit
-        disp("Couldn't find suitable k! Break")
+        warning('SEStresslet:find_kinfb','Max nbr of iterations reached');
         break;
     end
     
@@ -168,18 +173,16 @@ end
 function x = find_xi(Q,Lx,Ly,rc,tol)
 
 % Find xi using a Newton iteration
-x = 4/rc;       % Initial guess
+x = 1/rc;       % Initial guess
 maxit = 1e2; it = 0;
-
-% estimates from paper
-f = @(x) sqrt(Q * pi/(4*Lx*Ly*x))*exp(-x^2*rc^2) - tol;
-fp = @(x) -sqrt(Q*pi/(4*Lx*Ly))*exp(-x^2*rc^2)*(0.5*x^(-1.5)+...
-                2*rc^2*x*sqrt(1/x));
-
 xdiff = 1;
+
+f = @(a) exp(-a^2*rc^2)*a*rc*sqrt(2*pi*Q/(Lx*Ly)) - tol;
+fp = @(a) (1 - 2*a^2*rc^2)*exp(-a^2*rc^2)*sqrt(2*pi*Q/(Lx*Ly))*rc;
+
 while abs(xdiff) > 1e-2
     if it > maxit
-        disp("Couldn't find suitable xi! Break")
+        warning('SEStresslet:find_xi','Max nbr of iterations reached');
         break;
     end
     
