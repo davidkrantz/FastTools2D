@@ -1,12 +1,11 @@
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/mex/common
 )
-
 
 ## MEX functions
 matlab_add_mex(
 	NAME mex_K0_real
-	SRC bessellib.cpp ewald_tools.cpp mex_K0_real.cpp
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/bessellib.cpp ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_K0_real.cpp
 )
 target_link_libraries(mex_K0_real gsl gslcblas)
 
@@ -25,7 +24,7 @@ matlab_add_mex(
 ## MEX functions
 matlab_add_mex(
 	NAME mex_compK0xy
-	SRC bessellib.cpp mex_compK0xy.cpp
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/bessellib.cpp mex_compK0xy.cpp
 )
 target_link_libraries(mex_compK0xy gsl gslcblas)
 
