@@ -11,19 +11,19 @@ initewald
 Nsrc = 10000;
 Ntar = 10000;
 
-%Two components of the density function
+Lx = 1;
+Ly = 2;
+
+% Two components of the density function
 f1 = 10*rand(Nsrc,1);
 f2 = 10*rand(Nsrc,1);
 
 % Source and target loccations
-xsrc = 2*rand(Nsrc,1) - 1;
-ysrc = 2*rand(Nsrc,1) - 1;
+xsrc = Lx*rand(Nsrc,1);
+ysrc = Ly*rand(Nsrc,1);
 
-xtar = 2*rand(Ntar,1) - 1;
-ytar = 2*rand(Ntar,1) - 1;
-
-Lx = 1;
-Ly = 2;
+xtar = Lx*rand(Ntar,1);
+ytar = Ly*rand(Ntar,1);
 
 %% Compute solution with Spectral Ewald, try with a number of bins
 
@@ -31,19 +31,20 @@ Nb = [3, 9, 27];
 
 u = zeros(Ntar, length(Nb));
 
-for i = 1:length(Nb)
+for j = 1:length(Nb)
     tic
-    [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly,'Nb', Nb(i));
-    fprintf('     Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(i), toc);
+    [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly,'Nb', Nb(j), 'verbose', 1);
+    fprintf('     Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(j), toc);
     
-    u(:,i) = u1 + 1i*u2;
+    u(:,j) = u1 + 1i*u2;
 end
 
 %% Check that using a different number of bins doesn't affect solution
+
 E = zeros(length(Nb), length(Nb));
-for i = 1:length(Nb)
+for j = 1:length(Nb)
     for j = 1:length(Nb)
-        E(i,j) = max(abs(u(:,i) - u(:,j)));
+        E(j,j) = max(abs(u(:,j) - u(:,j)));
     end
 end
 fprintf('\n     Maximum error from changing number of bins: %.5e\n',max(max(E)));
@@ -64,4 +65,50 @@ Lx = 2*Lx;
 u2 = u3 + 1i*u4;
 
 fprintf('\n     Maximum error from creating periodic replicate: %.5e\n',...
-            max(abs(u1 - u2)));
+    max(abs(u1 - u2)));
+
+%% Check that timings scale as O(N Log N)
+
+Nsrc = 10.^[3, 4, 5, 6];
+tol = 10.^[-8, -12, -16];
+
+% NB: Choosing too low a tolerance can lead to problems...
+
+Lx = 1;
+Ly = 2;
+
+times = zeros(length(tol), length(Nsrc));
+
+loglog(Nsrc, Nsrc.*log(Nsrc));
+xlabel('Number of points');
+ylabel('time (s)');
+drawnow;
+
+hold on
+
+for i = 1:length(tol)
+    for j = 1:length(Nsrc)
+        % Two components of the density function
+        f1 = 10*rand(Nsrc(j),1);
+        f2 = 10*rand(Nsrc(j),1);
+        
+        % Source and target loccations
+        xsrc = Lx*rand(Nsrc(j),1);
+        ysrc = Ly*rand(Nsrc(j),1);
+        
+        xtar = Lx*rand(Nsrc(j),1);
+        ytar = Ly*rand(Nsrc(j),1);
+        
+        tic
+        [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1);
+        
+        times(i,j) = toc;
+        
+        
+    end
+    
+    loglog(Nsrc, times(i,:), '-o');
+    drawnow
+    
+end
+
