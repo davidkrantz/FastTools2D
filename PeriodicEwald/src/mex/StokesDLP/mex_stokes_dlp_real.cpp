@@ -211,8 +211,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double t = (n[2*j]*f[2*j]+n[2*j+1]*f[2*j+1]);
         s1 += t*psrc[2*j];
         s2 += t*psrc[2*j+1];
-        if (j==0)
-            mexPrintf("n1 = %3.3f, f1 = %3.3f, x =%3.3f, t = %3.3f, s1 = %3.3f\n", n[2*j], f[2*j], psrc[2*j], t, s1);
     }
     
     s1/=A;
