@@ -4,7 +4,7 @@ In principle, compiling should be as simple as running the cmake script to creat
 
 ## Ubuntu 16.04 LTS
 
-        cd build
+	cd build
 	cmake ..
 	make
 
@@ -12,7 +12,7 @@ In principle, compiling should be as simple as running the cmake script to creat
 
 Here you have to make sure that gcc and g++ are called instead of clang. I also had to manually add the include and library directories to help the compiler find the GNU scientific library.
 
-        cd build
+	cd build
 	export CPATH=/usr/local/include/
 	export LIBRARY_PATH=/usr/local/lib/
 	export LD_LIBRARY_PATH=/usr/local/lib/
