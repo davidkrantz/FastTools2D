@@ -5,10 +5,10 @@ include_directories(
 ## MEX functions
 matlab_add_mex(
 	NAME mex_stokes_slp_real
-	mex_stokes_slp_real.cpp
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_real.cpp
 )
 
 matlab_add_mex(
 	NAME mex_stokes_slp_kspace
-	mex_stokes_slp_kspace.cpp
+	SRC mex_stokes_slp_kspace.cpp
 )
