@@ -9,19 +9,16 @@ matlab_add_mex(
 )
 target_link_libraries(mex_K0_real gsl gslcblas)
 
-## MEX functions
 matlab_add_mex(
 	NAME mex_se_K0_2p_spreading
 	SRC mex_se_K0_2p_spreading.c
 )
 
-## MEX functions
 matlab_add_mex(
 	NAME mex_se_K0_2p_quadrature
 	SRC mex_se_K0_2p_quadrature.c
 )
 
-## MEX functions
 matlab_add_mex(
 	NAME mex_compK0xy
 	SRC ${CMAKE_SOURCE_DIR}/mex/common/bessellib.cpp mex_compK0xy.cpp
