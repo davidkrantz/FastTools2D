@@ -4,16 +4,11 @@
 #include <pmmintrin.h>
 
 #include "mm_mxmalloc.h"
+#include <ewald_tools.h>
 
 #define pi 3.1415926535897932385
 
 #define _mm_shuf2_pd(__A) (static_cast<__m128d>(__builtin_ia32_shufpd (static_cast<__v2df>(__A), static_cast<__v2df>(__A), 1)))
-
-void Assign(double *psrc, double *ptar, double len_x, double len_y, int nsrc, 
-        int ntar, int nside_x,int nside_y,
-        int* particle_offsets_src,int* box_offsets_src,int* nsources_in_box,
-        int* particle_offsets_tar,int* box_offsets_tar,int* ntargets_in_box);
-
 
 inline double expint(double x);
 
@@ -216,15 +211,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double t = (n[2*j]*f[2*j]+n[2*j+1]*f[2*j+1]);
         s1 += t*psrc[2*j];
         s2 += t*psrc[2*j+1];
-        
-       // mexPrintf("x = %3.3f, y=%3.3f\n", psrc[2*j], psrc[3*j+1]);
-        
+        if (j==0)
+            mexPrintf("n1 = %3.3f, f1 = %3.3f, x =%3.3f, t = %3.3f, s1 = %3.3f\n", n[2*j], f[2*j], psrc[2*j], t, s1);
     }
     
     s1/=A;
     s2/=A;
     
-   // mexPrintf("s1 = %3.3g, s2 = %3.3g, A = %3.3f\n", s1, s2, A);
     
     for(int j = 0;j<Ntar;j++) {
         T[2*particle_offsets_tar[j]] = Ts[2*j]/4/pi+s1;
@@ -239,107 +232,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     delete particle_offsets_tar;
     delete box_offsets_tar;
     delete ntargets_in_box;
-    
-}
-
-/*------------------------------------------------------------------------
- *This function assigns particles to boxes on the current grid.
- *------------------------------------------------------------------------
- */
-void Assign(double *psrc, double *ptar, double len_x, double len_y, int nsrc, 
-        int ntar, int nside_x, int nside_y,
-        int* particle_offsets_src,int* box_offsets_src,int* nsources_in_box,
-        int* particle_offsets_tar,int* box_offsets_tar,int* ntargets_in_box){
-    
-    //The total number of boxes.
-    int number_of_boxes = nside_x*nside_y;
-    int j;
-    int* in_box_src = new int[nsrc];
-    int* in_box_tar = new int[ntar];
-    int* particlenum_in_box_src = new int[number_of_boxes+1];
-    int* particlenum_in_box_tar = new int[number_of_boxes+1];
-    
-    //Clear the nparticles_in_box arrays.
-    for(j = 0;j<number_of_boxes;j++){
-        nsources_in_box[j] = 0;
-        ntargets_in_box[j] = 0;
-    }
-    
-    //Assign the sources to boxes.
-    for(j = 0;j<nsrc;j++) {
-        int box_x = (int)floor(nside_x*(psrc[2*j]/len_x+0.5));
-        int box_y = (int)floor(nside_y*(psrc[2*j+1]/len_y+0.5));
-        if(box_x < 0) box_x = 0;
-        if(box_x >= nside_x) box_x = nside_x-1;
-        if(box_y < 0) box_y = 0;
-        if(box_y >= nside_y) box_y = nside_y-1;
-        in_box_src[j] =  box_y*nside_x + box_x;
-        nsources_in_box[in_box_src[j]]++;
-    }
-    
-    //Assign the targets to boxes.
-    for(j = 0;j<ntar;j++) {
-        int box_x = (int)floor(nside_x*(ptar[2*j]/len_x+0.5));
-        int box_y = (int)floor(nside_y*(ptar[2*j+1]/len_y+0.5));
-        if(box_x < 0) box_x = 0;
-        if(box_x >= nside_x) box_x = nside_x-1;
-        if(box_y < 0) box_y = 0;
-        if(box_y >= nside_y) box_y = nside_y-1;
-        in_box_tar[j] =  box_y*nside_x + box_x;
-        ntargets_in_box[in_box_tar[j]]++;
-    }
-    
-    /*
-    printf("SOURCES\n");
-    for (j=0; j<nsrc; j++)
-    {
-     printf("%d\n", in_box_src[j]);  
-    }
-    
-    printf("\nTargets\n");
-    for (j=0; j<ntar; j++)
-    {
-     printf("%d\n", in_box_tar[j]);  
-    }
-    
-    printf("\nBOX COUNT\n");
-    for (j=0; j<number_of_boxes; j++)
-    {
-     printf("%d\n", ntargets_in_box[j]);  
-     printf("%d\n", nsources_in_box[j]);  
-    }
-    */
-     
-    //box_offsets is the offsets of the boxes in particle_offsets to be
-    //computed below. particlenum_in_box is a temporary array.
-    box_offsets_src[0] = particlenum_in_box_src[0] = 0;
-    box_offsets_tar[0] = particlenum_in_box_tar[0] = 0;
-    int isrc = 0;
-    int itar = 0;
-    
-    for(j=1;j<number_of_boxes+1;j++) {
-        isrc += nsources_in_box[j-1];
-        
-        particlenum_in_box_src[j] = isrc;
-        
-        box_offsets_src[j] = isrc;
-        
-        itar += ntargets_in_box[j-1];
-        particlenum_in_box_tar[j] = itar;
-        
-        box_offsets_tar[j] = itar;
-    }
-    
-    
-    //The offsets of the particles in each box in the z and q arrays.
-    for(j=0;j<nsrc;j++)
-        particle_offsets_src[particlenum_in_box_src[in_box_src[j]]++] = j;
-    for(j=0;j<ntar;j++)
-        particle_offsets_tar[particlenum_in_box_tar[in_box_tar[j]]++] = j;
-    
-    delete in_box_src;
-    delete particlenum_in_box_src;
-    delete in_box_tar;
-    delete particlenum_in_box_tar;
     
 }
