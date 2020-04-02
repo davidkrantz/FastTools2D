@@ -25,6 +25,7 @@ vdirect = zeros(numel(f1),1);
 tic
 for k = 1:numel(f1)
     
+    % skip self interaction term
     ind = [(1:k-1) (k+1:numel(f1))];
 
     rx = xsrc(k) - xsrc(ind);
