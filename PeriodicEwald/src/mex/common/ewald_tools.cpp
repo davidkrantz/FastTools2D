@@ -1,4 +1,4 @@
-#include <ewald_tools.h>
+#include "ewald_tools.h"
 
 /*------------------------------------------------------------------------
  *This function assigns particles to boxes on the current grid.
@@ -76,6 +76,5 @@ void Assign(double *psrc, double *ptar, double Lx, double Ly, int nsrc,
     delete in_box_src;
     delete particlenum_in_box_src;
     delete in_box_tar;
-    delete particlenum_in_box_tar;
-    
+    delete particlenum_in_box_tar;   
 }
