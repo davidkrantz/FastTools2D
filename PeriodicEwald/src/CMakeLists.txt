@@ -6,9 +6,7 @@ if(CMAKE_VERSION VERSION_LESS "3.3")
     "using local FindMatlab module extracted from v3.3")
 
   # Where we keep FindMatlab module
-  set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/cmake)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 endif()
 
 if(APPLE)
@@ -27,12 +25,14 @@ if(NOT Matlab_FOUND)
   message(FATAL_ERROR "MATLAB not found.")
 endif()
 
-find_package(GSL REQUIRED)
-if(NOT GSL_FOUND)
-  message(FATAL_ERROR "GSL not found.")
-else()
-  message("GSL found.")
-endif()
+# NOTE: Ewald code for K0 requires GSL
+
+#find_package(GSL REQUIRED)
+#if(NOT GSL_FOUND)
+#  message(FATAL_ERROR "GSL not found.")
+#else()
+#  message("GSL found.")
+#endif()
 
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/")
@@ -46,6 +46,5 @@ include_directories(
 )
 
 # Add modules with MEX to be built
-add_subdirectory("${PROJECT_SOURCE_DIR}/mex/K0")
 add_subdirectory("${PROJECT_SOURCE_DIR}/mex/StokesSLP")
 add_subdirectory("${PROJECT_SOURCE_DIR}/mex/StokesDLP")
