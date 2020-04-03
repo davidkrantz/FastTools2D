@@ -1,4 +1,5 @@
-function [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, varargin)
+function [u1, u2, ur, uk, xi] = StokesSLP_ewald_2p(xsrc, ysrc,...
+            xtar, ytar, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Spectral Ewald evaluation of the doubly-periodic Stokeslet.
 %
@@ -18,7 +19,9 @@ function [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, v
 % Output:
 %       u1, x component of velocity
 %       u2, y component of velocity
-%
+%       ur, real component of Ewald decomposition (as a 2xN matrix)
+%       ur, Fourier component of Ewald decomposition (as a 2xN matrix)
+%       xi, Ewald parameter
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % set default parameter values
@@ -107,8 +110,7 @@ if verbose
     tic
 end
 
-%Self-term integrated into the real sum
-ureal = mex_stokes_slp_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
+ur = mex_stokes_slp_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
@@ -119,10 +121,10 @@ uk = mex_stokes_slp_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
-    fprintf("*********************************************************\n\n");
+    fprintf("*******************************************************\n\n");
 end
 
-u = ureal + uk;
+u = ur + uk;
 u1 = u(1,:);
 u2 = u(2,:);
 
