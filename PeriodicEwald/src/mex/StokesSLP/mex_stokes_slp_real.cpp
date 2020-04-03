@@ -341,8 +341,8 @@ plhs[0] = mxCreateDoubleMatrix(2, Ntar, mxREAL);
 double* u = mxGetPr(plhs[0]);
 /*Write computed values to output vector u. Note the mapping of indices: u[i] = us[i+1]. FF*/
 for(int j = 0;j<Ntar;j++) {
-    u[2*particle_offsets_tar[j]] = us[2*j+1];
-    u[2*particle_offsets_tar[j]+1] = us[2*j];
+    u[2*particle_offsets_tar[j]] = us[2*j+1] / (4*pi);
+    u[2*particle_offsets_tar[j]+1] = us[2*j] / (4*pi);
 }
 
 /*Clean up. FF*/

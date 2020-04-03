@@ -402,8 +402,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         
         tmp = 4*xi*xi/eta;
         tmp = tmp*tmp*h_x*h_y/pi;
-        uk[2*k] *= tmp;
-        uk[2*k+1] *= tmp;
+        uk[2*k] *= tmp / (4*pi);
+        uk[2*k+1] *= tmp / (4*pi);
     }
     
     //Clean up
