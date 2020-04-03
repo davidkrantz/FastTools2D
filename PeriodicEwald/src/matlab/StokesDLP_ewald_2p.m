@@ -1,4 +1,4 @@
-function [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
+function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Spectral Ewald evaluation of the doubly-periodic  double-layer potential.
 %
@@ -111,7 +111,7 @@ if verbose
     tic
 end
 
-ureal = mex_stokes_dlp_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
+ur = mex_stokes_dlp_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
@@ -128,7 +128,7 @@ end
 % Fourier space part needs to be scaled by L/2*pi to work for arbitrary L
 uk = (-1/(Lx*Ly)*uk)*Lx*Ly/(2*pi)^2;
 
-u = ureal + uk;
+u = ur + uk;
 
 u1 = u(1,:);
 u2 = u(2,:);
