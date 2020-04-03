@@ -103,8 +103,7 @@ for i = 1:length(tol)
         [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1);
         
         times(i,j) = toc;
-        
-        
+                
     end
     
     loglog(Nsrc, times(i,:), '-o');
