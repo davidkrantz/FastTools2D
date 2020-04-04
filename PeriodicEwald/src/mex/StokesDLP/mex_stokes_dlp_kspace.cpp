@@ -201,24 +201,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //We apply the appropriate k-space filter associated with the 
     //Stresslet. This involves Fast Fourier Transforms.
     
-//     for(int tmpl = 0; tmpl<M; tmpl++) {
-//         mexPrintf("H1[%d]=%f\n",tmpl,H1[tmpl]); 
-//     }
-    
-        
-//     double* tmpFF = mxGetPr(fft2rhs[0]);
-
-    
-//     for(int tmpl = 0; tmpl<M*M; tmpl++) {
-//         if(abs(H1[tmpl])>1e-3) {
-//             mexPrintf("H1[%d]=%f\n",tmpl,H1[tmpl]);
-//         }
-//         if(abs(tmpFF[tmpl])>1e-5) {
-//             mexPrintf("H1[%d]=%f\n",tmpl,tmpFF[tmpl]);
-//         }
-//     }
-    
-    
     //Call Matlab's routines to compute the 2D FFT. Other choices,
     //such as fftw could possibly be better, mainly because of the poor
     //complex data structure Matlab uses which we now have to deal with.
@@ -250,47 +232,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if(Hhat1_im == NULL) {        
         Hhat1_im = (double*) mxCalloc(cs,sizeof(double));        
         mxSetPi(fft2lhs[0],Hhat1_im);
-//         mexPrintf("H1 null\n");
     }
     if(Hhat2_im == NULL) {
         Hhat2_im = (double*) mxCalloc(cs,sizeof(double));
         mxSetPi(fft2lhs[1],Hhat2_im);
-//         mexPrintf("H2 null\n");
     }
     
     if(Hhat3_im == NULL) {
         Hhat3_im = new double[M_x*M_y];
         memset(Hhat3_im,0,M_x*M_y*sizeof(double));
         alloc3 = 1;
-//         mexPrintf("H3 null\n");
     }
     
     if(Hhat4_im == NULL) {
         Hhat4_im = new double[M_x*M_y];
         memset(Hhat4_im,0,M_x*M_y*sizeof(double));
         alloc4 = 1;
-//         mexPrintf("H4 null\n");
     }
-    
-//     for(int tmpl = 0; tmpl<20; tmpl++) {
-//         mexPrintf("Hhat1_re[%d]=%f\n",tmpl,Hhat1_re[tmpl]);
-//         mexPrintf("Hhat1_im[%d]=%f\n",tmpl,Hhat1_im[tmpl]);
-//     }
-//     for(int tmpl = 0; tmpl<20; tmpl++) {
-//         mexPrintf("Hhat2_re[%d]=%f\n",tmpl,Hhat2_re[tmpl]);
-//         mexPrintf("Hhat2_im[%d]=%f\n",tmpl,Hhat2_im[tmpl]);
-//     }
-//     for(int tmpl = 0; tmpl<20; tmpl++) {
-//         mexPrintf("Hhat3_re[%d]=%f\n",tmpl,Hhat3_re[tmpl]);
-//         mexPrintf("Hhat3_im[%d]=%f\n",tmpl,Hhat3_im[tmpl]);
-//     }
-//     for(int tmpl = 0; tmpl<20; tmpl++) {
-//         mexPrintf("Hhat4_re[%d]=%f\n",tmpl,Hhat4_re[tmpl]);
-//     }
-    
-    
-    
-    
+
     //Apply filter in the frequency domain. This is a completely 
     //parallel operation. The FFT gives the frequency components in
     //non-sequential order, so we have to split the loops. One could
@@ -306,22 +265,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         else
             k1 = 2.0*pi/L_x*(j-M_x);
         
-//         mexPrintf("k1=%f\n",k1);
-        
         for(int k = 0;k<=M_y/2;k++,ptr++) {
             double k2 = 2.0*pi/L_y*k;
             double Ksq = k1*k1+k2*k2;
             
-//             mexPrintf("Ksq=%f\n",Ksq);
-//             if (Ksq == 0) {
-//                 continue;
-//             }
-//             
             double e = exp(-0.25*(1-eta)/(xi*xi)*Ksq)/Ksq/Ksq;
-            
-//             mexPrintf("e=%f\n",e);
-            
-            
             double t = (1 + 0.25*Ksq/xi/xi);
            
             double B111 = 3.0*k1*Ksq - 2.0*k1*k1*k1;
@@ -492,10 +440,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         if(mx >= 0 && my >= 0 && mx < M_x-P-1 && my < M_y-P-1) {
             
             int idx = mx*M_y+my;
-            
-//             printf("point %d: x=%2.16f, px = %2.16g, mx = %d, my=%d, idx = %d\n",
-//                     k+1, psrc[2*k], px, mx, my, idx);
-//             
+                
             for(int x = 0;x<P+1;x++) {
                 double ey = ex*e4y*e1[x];
                 
@@ -527,31 +472,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
         
         tmp = 4*xi*xi/eta;
-        tmp = tmp*tmp*h_x*h_y;
-        Tk[2*k] *= tmp;
-        Tk[2*k+1] *= tmp;
+        tmp = tmp*tmp*h_x*h_y/pi;
+        Tk[2*k] *= tmp / (4*pi);
+        Tk[2*k+1] *= tmp / (4*pi);
 
     } 
-    
-    // Add on zero mode
-    double A = L_x * L_y;
-    double s1 = 0;
-    double s2 = 0;
-    for(int j = 0;j<Nsrc;j++) {
-        double t = (n[2*j]*f[2*j]+n[2*j+1]*f[2*j+1]);
-        s1 += t*psrc[2*j];
-        s2 += t*psrc[2*j+1];
-    }
-    
-    s1/=A;
-    s2/=A;
-    
-    for(int j = 0;j<Ntar;j++) {
-        Tk[2*j] += s1;
-        Tk[2*j+1] += s2;
-    }
-    
-    
+
     //Clean up
     mxDestroyArray(fft2rhs[0]);
     mxDestroyArray(fft2rhs[1]);
