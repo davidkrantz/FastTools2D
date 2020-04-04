@@ -121,13 +121,14 @@ end
 
 uk = mex_stokes_dlp_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
 
+% Add on zero mode
+uk(1,:) = uk(1,:) + 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+uk(2,:) = uk(2,:) + 4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
-
-% Fourier space part needs to be scaled by L/2*pi to work for arbitrary L
-uk = (-1/(Lx*Ly)*uk)*Lx*Ly/(2*pi)^2;
 
 u = ur + uk;
 
