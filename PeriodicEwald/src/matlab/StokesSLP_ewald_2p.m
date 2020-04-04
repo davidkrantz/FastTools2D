@@ -26,7 +26,7 @@ function [u1, u2, ur, uk, xi] = StokesSLP_ewald_2p(xsrc, ysrc,...
 
 % set default parameter values
 P = 24;             % support points in each direction
-Nb = 100;             % average number of points per box for real space sum
+Nb = 9;             % average number of points per box for real space sum
 tol = 1e-16;        % tolerance, used to get parameters from estimates
 verbose = 0;
 
@@ -121,7 +121,7 @@ uk = mex_stokes_slp_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
-    fprintf("*******************************************************\n\n");
+    fprintf("*********************************************************\n\n");
 end
 
 u = ur + uk;

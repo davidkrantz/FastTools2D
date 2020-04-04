@@ -1,4 +1,5 @@
-function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
+function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc,...
+                    xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Spectral Ewald evaluation of the doubly-periodic  double-layer potential.
 %
@@ -26,7 +27,7 @@ function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n
 
 % set default parameter values
 P = 24;             % support points in each direction
-Nb = 100;             % average number of points per box for real space sum
+Nb = 9;             % average number of points per box for real space sum
 tol = 1e-16;        % tolerance, used to get parameters from estimates
 verbose = 0;
 
@@ -148,7 +149,8 @@ k = round(5*xi);       % Initial guess
 maxit = 1e2; it = 0;
 
 f = @(k) sqrt(k*8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2)) - tol;
-fp = @(k) sqrt(8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2))*(0.5*k^(-1/2) - 2*k^(3/2)/(4*xi^2));
+fp = @(k) sqrt(8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2))*...
+            (0.5*k^(-1/2) - 2*k^(3/2)/(4*xi^2));
 
 kdiff = 1;
 while abs(kdiff) > 1e-2
