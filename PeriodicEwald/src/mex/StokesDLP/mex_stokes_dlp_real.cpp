@@ -203,23 +203,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     plhs[0] = mxCreateDoubleMatrix(2, Ntar, mxREAL);
     
     double* T = mxGetPr(plhs[0]);
-    double A = len_x*len_y;
-    
-    double s1 = 0;
-    double s2 = 0;
-    for(int j = 0;j<Nsrc;j++) {
-        double t = (n[2*j]*f[2*j]+n[2*j+1]*f[2*j+1]);
-        s1 += t*psrc[2*j];
-        s2 += t*psrc[2*j+1];
-    }
-    
-    s1/=A;
-    s2/=A;
-    
     
     for(int j = 0;j<Ntar;j++) {
-        T[2*particle_offsets_tar[j]] = Ts[2*j]/4/pi+s1;
-        T[2*particle_offsets_tar[j]+1] = Ts[2*j+1]/4/pi+s2;
+        T[2*particle_offsets_tar[j]] = Ts[2*j]/4/pi;
+        T[2*particle_offsets_tar[j]+1] = Ts[2*j+1]/4/pi;
     }
     
     _mm_mxFree(Ts);

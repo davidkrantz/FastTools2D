@@ -533,6 +533,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     } 
     
+    // Add on zero mode
+    double A = L_x * L_y;
+    double s1 = 0;
+    double s2 = 0;
+    for(int j = 0;j<Nsrc;j++) {
+        double t = (n[2*j]*f[2*j]+n[2*j+1]*f[2*j+1]);
+        s1 += t*psrc[2*j];
+        s2 += t*psrc[2*j+1];
+    }
+    
+    s1/=A;
+    s2/=A;
+    
+    for(int j = 0;j<Ntar;j++) {
+        Tk[2*j] += s1;
+        Tk[2*j+1] += s2;
+    }
+    
+    
     //Clean up
     mxDestroyArray(fft2rhs[0]);
     mxDestroyArray(fft2rhs[1]);
