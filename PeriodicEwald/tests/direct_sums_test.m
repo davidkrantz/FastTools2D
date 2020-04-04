@@ -10,10 +10,12 @@ initewald
 %% Set up data
 
 % Ewald tolerance
-tol = 1e-8;
+tol = 1e-16;
+% k trunctation for direct summation
+kinf = 100;
 
-Nsrc = 100;
-Ntar = 100;
+Nsrc = 10;
+Ntar = 10;
 
 Lx = 1;
 Ly = 2;
@@ -33,6 +35,12 @@ ysrc = Ly*rand(Nsrc,1);
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 
+% wrap source points to reference cell, for testing this is necessary
+% because the k=0 mode in the double-layer potential depends on the source
+% locations
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+
 %% Check single-layer potential
 fprintf("*********************************************************\n");
 fprintf('TESTING DIRECT SUMS FOR STOKES SINGLE-LAYER POTENTIAL\n');
@@ -47,16 +55,15 @@ fprintf('CHECKING REAL SUM...\n');
 ur_direct = stokes_slp_real_ds(xsrc, ysrc, xtar, ytar,...
                         f1, f2, Lx, Ly, xi);
  
-fprintf('MAXIMUM ERROR: %.5e\n',max(max(ur_direct - ur_ewald)));
+fprintf('MAXIMUM ERROR: %.5e\n',max(max(abs(ur_direct - ur_ewald))));
 
 fprintf("*********************************************************\n");
 fprintf('CHECKING FOURIER SUM...\n');
 
-kinf = 100;
 uk_direct = stokes_slp_kspace_ds(xsrc, ysrc, xtar, ytar,...
                         f1, f2, Lx, Ly, xi, kinf);
  
-fprintf('MAXIMUM ERROR: %.5e\n',max(max(uk_direct - uk_ewald)));
+fprintf('MAXIMUM ERROR: %.5e\n',max(max(abs(uk_direct - uk_ewald))));
 
 %% Check double-layer potential
 fprintf("*********************************************************\n");
@@ -69,10 +76,16 @@ fprintf("*********************************************************\n");
 
 fprintf('CHECKING REAL SUM...\n');
 % Compute direct sums
-ur_direct = -stokes_dlp_real_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
+ur_direct = stokes_dlp_real_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
                         f1, f2, Lx, Ly, xi);
  
-fprintf('MAXIMUM ERROR: %.5e\n',max(max(ur_direct - ur_ewald)));
+fprintf('MAXIMUM ERROR: %.5e\n',max(max(abs(ur_direct - ur_ewald))));
 
 fprintf("*********************************************************\n");
+fprintf('CHECKING FOURIER SUM...\n');
+
+uk_direct = stokes_dlp_kspace_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
+                        f1, f2, Lx, Ly, xi, kinf);
+ 
+fprintf('MAXIMUM ERROR: %.5e\n',max(max(abs(uk_direct - uk_ewald))));
 
