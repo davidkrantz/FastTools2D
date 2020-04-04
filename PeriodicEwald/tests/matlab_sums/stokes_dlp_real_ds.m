@@ -68,7 +68,9 @@ ndotf = n1*f1 + n2*f2;
 
 r = sqrt(r1^2 + r2^2);
 
-u1 = exp(-xi^2*r^2)*(-4*r1*rdotn*rdotf/r^4*(1 + xi^2*r^2) + 2*xi^2*(f1*rdotn + n1*rdotf + ndotf*r1));
-u2 = exp(-xi^2*r^2)*(-4*r2*rdotn*rdotf/r^4*(1 + xi^2*r^2) + 2*xi^2*(f2*rdotn + n2*rdotf + ndotf*r2));
+u1 = exp(-xi^2*r^2)*(-4*r1*rdotn*rdotf/r^4*(1 + xi^2*r^2) +...
+            2*xi^2*(f1*rdotn + n1*rdotf + ndotf*r1));
+u2 = exp(-xi^2*r^2)*(-4*r2*rdotn*rdotf/r^4*(1 + xi^2*r^2) +...
+            2*xi^2*(f2*rdotn + n2*rdotf + ndotf*r2));
 
 end
