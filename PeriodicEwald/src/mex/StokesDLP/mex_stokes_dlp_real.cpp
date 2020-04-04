@@ -98,8 +98,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
      * box are within the distance sqrt(cutoffsq) of each other. FF*/
     double cutoffsq = len_x*len_y/nside_x/nside_y;
     double xi2 = xi*xi;
-    
-   // mexPrintf("rc2 = %3.3f, xi = %3.3f\n", cutoffsq, xi);
 
     /*Loop through boxes*/
 #pragma omp parallel for    
@@ -116,10 +114,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             for(int k=sidx;k<sidx+nsources_in_box[current_box];k++) {
                                 
-//                 double x1 = (psrc_a[2*k]-ptar_a[2*j]);
-//                 double x2 = (psrc_a[2*k+1]-ptar_a[2*j+1]);
-                double x1 = ptar_a[2*j]-psrc_a[2*k];
-                double x2 = ptar_a[2*j+1]-psrc_a[2*k+1];
+                double x1 = psrc_a[2*k] - ptar_a[2*j];
+                double x2 = psrc_a[2*k+1] - ptar_a[2*j+1];
                 
                 double r2 = x1*x1+x2*x2;
                 
@@ -139,11 +135,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 double T211 = x2*x1*x1*facb + prefac*x2;
                 double T212 = x2*x1*x2*facb + prefac*x1;
                 double T222 = x2*x2*x2*facb + prefac*3*x2;
-                Ts[2*j+1] += e2*(T211*S[4*k] + T212*(S[4*k+1] + S[4*k+2]) + T222*S[4*k+3]); 
-                
-               // printf("x1 = %3.5e, x2 = %3.5e, r=%3.5e\n", x1, x2, r2); 
-           
-            } 
+                Ts[2*j+1] += e2*(T211*S[4*k] + T212*(S[4*k+1] + S[4*k+2]) + T222*S[4*k+3]);  
+            }
         }
         
         //Compute interactions from the nearest neighbors.
@@ -156,7 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             int t_y = (per_source_y+nside_y)%nside_y;
             //The number of the source nearest neighbor box.
             int source_box = t_y*nside_x + t_x;
-    
+            
             if(nsources_in_box[source_box] > 0) {
                 //z-offset of the source box corrected for periodicity.
                 double zoff_re = (len_x*(per_source_x-t_x))/nside_x;
@@ -166,16 +159,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     
                     int idx = box_offsets_src[source_box];
                     for(int l=0;l<nsources_in_box[source_box];l++,idx++) {
-//                         double x1 = psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re;
-//                         double x2 = psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im;
-                        double x1 = ptar_a[2*(tidx+k)]-psrc_a[2*idx]-zoff_re;
-                        double x2 = ptar_a[2*(tidx+k)+1]-psrc_a[2*idx+1]-zoff_im;
+                        double x1 = psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re;
+                        double x2 = psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im;
                         
                         double r2 = x1*x1+x2*x2;
-                        //printf("x1 = %3.5e, x2 = %3.5e, r=%3.5e\n", x1, x2, r2);
                         
                         if(r2 < cutoffsq) {
-
+                            
                             double e2 = exp(-xi2*r2);
                             double prefac = 2*xi2;
                             double facb = -4*(1+xi2*r2)/r2/r2;
@@ -189,8 +179,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             double T212 = x2*x1*x2*facb + prefac*x1;
                             double T222 = x2*x2*x2*facb + prefac*3*x2;
                             Ts[2*(tidx+k)+1] += e2*(T211*S[4*idx] + T212*(S[4*idx+1] + S[4*idx+2]) + T222*S[4*idx+3]);
-                        }                        
-                    }                  
+                        }
+                    }
                 }
             } 
         }
