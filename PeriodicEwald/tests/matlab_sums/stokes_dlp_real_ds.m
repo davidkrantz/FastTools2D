@@ -46,7 +46,7 @@ for n=1:Nsrc
                     continue
                 else
                     [utmp1, utmp2] =  stokeslet_real_sum(r1,r2,...
-                                f1(n),f2(n),n1(n),n2(n),xi);
+                                n1(n), n2(n), f1(n),f2(n),xi);
                     ureal1(m) = ureal1(m) + utmp1;
                     ureal2(m) = ureal2(m) + utmp2;
                 end
@@ -58,13 +58,9 @@ end
 
 ureal = [ureal1; ureal2] / (4*pi);
 
-% add on the zero mode from the kspace sum here, because that's done in the
-% real space mex file
-ureal = ureal + zero_mode(xsrc, ysrc, n1, n2, f1, f2) / (Lx*Ly);
-
 end
 
-function [u1, u2] = stokeslet_real_sum(r1, r2, f1, f2, n1, n2, xi)
+function [u1, u2] = stokeslet_real_sum(r1, r2, n1, n2, f1, f2, xi)
 
 rdotf = r1*f1 + r2*f2;
 rdotn = r1*n1 + r2*n2;
@@ -72,17 +68,7 @@ ndotf = n1*f1 + n2*f2;
 
 r = sqrt(r1^2 + r2^2);
 
-u1 = exp(-xi^2*r^2)*(4*r1*rdotn*rdotf/r^4 + 2*xi^2*(f1*rdotn + n1*rdotf + ndotf*r1));
-u2 = exp(-xi^2*r^2)*(4*r2*rdotn*rdotf/r^4 + 2*xi^2*(f2*rdotn + n2*rdotf + ndotf*r2));
-
-end
-
-function u0 = zero_mode(xsrc, ysrc, n1, n2, f1, f2)
-
-u0 = zeros(2, length(xsrc));
-
-fdotn = f1.*n1 + f2.*n2;
-u0(1,:) = 4*pi*xsrc.*fdotn;
-u0(2,:) = 4*pi*ysrc.*fdotn;
+u1 = exp(-xi^2*r^2)*(-4*r1*rdotn*rdotf/r^4*(1 + xi^2*r^2) + 2*xi^2*(f1*rdotn + n1*rdotf + ndotf*r1));
+u2 = exp(-xi^2*r^2)*(-4*r2*rdotn*rdotf/r^4*(1 + xi^2*r^2) + 2*xi^2*(f2*rdotn + n2*rdotf + ndotf*r2));
 
 end

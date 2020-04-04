@@ -8,8 +8,8 @@ clc
 initewald
 
 %% Set up data
-Nsrc = 10;
-Ntar = 10;
+Nsrc = 100;
+Ntar = 100;
 
 Lx = 1;
 Ly = 2;
@@ -66,7 +66,7 @@ fprintf('*****************************************************\n');
 
 fprintf('CHECKING REAL SUM...\n');
 % Compute direct sums
-ur_direct = stokes_dlp_real_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
+ur_direct = -stokes_dlp_real_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
                         f1, f2, Lx, Ly, xi);
  
 fprintf('MAXIMUM ERROR: %.5e\n',max(max(ur_direct - ur_ewald)));
