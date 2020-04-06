@@ -28,7 +28,7 @@ ytar = Ly*rand(Ntar,1);
 %% Check that timings scale as O(N Log N)
 
 Nsrc = 2.^(8:19);
-tol = 10.^[-4, -8, -12, -16];
+tol = 10.^[-2, -4, -8, -12, -16];
 
 % NB: Choosing too low a tolerance can lead to problems...
 
@@ -70,14 +70,15 @@ end
 
 loglog(Nsrc, Nsrc.*log(Nsrc)*times(end,1)/(Nsrc(1)*log(Nsrc(1))));
 
-legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', '$\mathcal{O}(N\log N)$'}...
-            , 'interpreter',  'latex', 'location', 'NW');
+legend({'tol = 1e-2', 'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16',...
+            '$\mathcal{O}(N\log N)$'}, 'interpreter',  'latex',...
+            'location', 'NW');
 
 title('Stokes Single-Layer Potential');
 %% Check that timings scale as O(N Log N)
 
 Nsrc = 2.^(8:17);
-tol = 10.^[-4, -8, -12, -16];
+tol = 10.^[-2, -4, -8, -12, -16];
 
 Lx = 1;
 Ly = 2;
@@ -121,8 +122,8 @@ end
         
 loglog(Nsrc, Nsrc.*log(Nsrc)*times(end,1)/(Nsrc(1)*log(Nsrc(1))));
 
-legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', ...
-            '$\mathcal{O}(N\log N)$'}...
-            , 'interpreter',  'latex', 'location', 'NW');
+legend({'tol = 1e-2', 'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16',...
+            '$\mathcal{O}(N\log N)$'}, 'interpreter',  'latex',...
+            'location', 'NW');
 
 title('Stokes Double-Layer Potential');
