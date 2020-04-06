@@ -28,5 +28,11 @@ Here you have to make sure that gcc and g++ are called instead of clang. I also 
 In the `tests` directory, there are several tests that can be used to verify the compilation worked correctly:
 * consistency_test.m: checks that changing the Ewald parameters and enlarging the periodic box by adding replicates of the reference cell don't change the results
 * direct_sums_test.m: compares the spectral Ewald implementation to matlab direct sums of the real and Fourier parts. The Matlab direct sum does not truncate in real space, and in Fourier space it does not spread the data to a uniform grid and thus does not use FFTs
-* timings_test.m: checks the timings of the code for various numbers of source and target points. The timing should scale as O(N log N), where N is total number of points
+* timings_test.m: checks the timings of the code for increasing numbers of source and target points. The timing should scale as O(N log N), where N is total number of points
 * stresslet_indentity_test.m: verifies the stresslet identity for points inside and outside a circle
+
+## References
+
+Ewald decomposition of two-dimensional Stokeslet and stresslet along with error estimates:
+
+Pålsson and Torberg, 2019. *An integral equation method for closely interacting surfactant-covered droplets in wall-confined Stokes flow*. [arxiv.org/pdf/1909.12581.pdf]
