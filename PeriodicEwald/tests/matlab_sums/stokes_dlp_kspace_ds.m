@@ -65,8 +65,8 @@ end
 uk = real([uk1; uk2]) / (Lx*Ly);
 
 % Add on zero mode
-uk(1,:) = uk(1,:) + 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-uk(2,:) = uk(2,:) + 4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+uk(1,:) = uk(1,:) - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+uk(2,:) = uk(2,:) - sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 end
 
