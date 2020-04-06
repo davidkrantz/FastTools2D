@@ -27,7 +27,7 @@ ytar = Ly*rand(Ntar,1);
 
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 2.^(8:17);
+Nsrc = 2.^(8:19);
 tol = 10.^[-4, -8, -12, -16];
 
 % NB: Choosing too low a tolerance can lead to problems...
@@ -53,7 +53,8 @@ for i = 1:length(tol)
         ytar = Ly*rand(Nsrc(j),1);
         
         tic
-        [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1);
+        [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
+                Lx, Ly, 'tol', tol(i), 'verbose', 1, 'Nb', 9);
         
         times(i,j) = toc;
                 
@@ -104,7 +105,7 @@ for i = 1:length(tol)
         
         tic
         [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, ...
-            f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1);
+            f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1, 'Nb', 9);
         
         times(i,j) = toc;
               
@@ -120,7 +121,8 @@ end
         
 loglog(Nsrc, Nsrc.*log(Nsrc)*times(end,1)/(Nsrc(1)*log(Nsrc(1))));
 
-legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', '$\mathcal{O}(N\log N)$'}...
+legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', ...
+            '$\mathcal{O}(N\log N)$'}...
             , 'interpreter',  'latex', 'location', 'NW');
 
 title('Stokes Double-Layer Potential');
