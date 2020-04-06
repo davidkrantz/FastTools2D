@@ -160,7 +160,8 @@ while abs(kdiff) > 1e-2
         break;
     end
     
-    kdiff = f(k)/fp(k);
+    % limit the step size in the negative direction
+    kdiff = min(f(k)/fp(k), 0.9*k);
     k = k - kdiff;
     
     it = it + 1;
@@ -189,7 +190,8 @@ while abs(xdiff) > 1e-2
         break;
     end
     
-    xdiff = f(x)/fp(x);
+    % limit the step size in the negative direction
+    xdiff = min(f(x)/fp(x), 0.9*x); 
     x = x - xdiff;
     
     it = it + 1;
