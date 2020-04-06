@@ -1,4 +1,18 @@
-% Check stresslet identity
+% Check stresslet identity. To do this we set up a circle of radius r, and
+% prescribe a density f = e_i (i = 1,2). Then if u(x) is given by the
+% double-layer potential, the following identity holds, even for periodic
+% sums:
+% u(x) = -1, x inside circle, 
+%         0, x outside circle,
+%        -1/2, x on the circle.
+% We will consider only the first two cases, and look at the average u at 
+% a circle of points inside and another one outside the original circle. 
+
+close all
+clearvars
+clc
+
+initewald
 
 fprintf("*********************************************************\n");
 fprintf("Checking stresslet identity\n")
@@ -17,6 +31,7 @@ Ly = 4*r;
 Nsrc = 256;
 Ntar = 16;
 
+% use trapezoid rule
 hsrc = 2*pi/Nsrc;
 theta = (hsrc : hsrc : 2*pi)';
 
@@ -45,10 +60,10 @@ ytar(end/2+1:end) = r_out*sin(theta);
 [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
 fprintf("f1 = 1, f2 = 0\n");
-fprintf("error in mean interior solution: (%3.3e, %3.3e)\n",...
-    mean(u1(1:end/2) + 1), mean(u2(1:end/2)))
-fprintf("error in mean exterior solution (%3.3e, %3.3e)\n",...
-    mean(u1(end/2+1:end)), mean(u2(end/2+1:end))); 
+fprintf("error in mean interior solution: %3.3e\n",...
+    norm(u1(1:end/2) + 1i*u2(1:end/2) + 1));
+fprintf("error in mean exterior solution %3.3e\n",...
+    norm(u1(end/2+1:end) + 1i*u2(end/2+1:end))); 
 
 % y component = 1
 f1 = zeros(Nsrc,1);
@@ -56,10 +71,11 @@ f2 = hsrc*ones(Nsrc,1);
 
 [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
-fprintf("error in mean interior solution: (%3.3e, %3.3e)\n",...
-    mean(u1(1:end/2)), mean(u2(1:end/2) + 1))
-fprintf("error in mean exterior solution (%3.3e, %3.3e)\n",...
-    mean(u1(end/2+1:end)), mean(u2(end/2+1:end))); 
+fprintf("\nf1 = 0, f2 = 1\n");
+fprintf("error in mean interior solution: %3.3e\n",...
+    norm(u1(1:end/2) + 1i*u2(1:end/2) + 1i));
+fprintf("error in mean exterior solution %3.3e\n",...
+    norm(u1(end/2+1:end) + 1i*u2(end/2+1:end))); 
 
 
 

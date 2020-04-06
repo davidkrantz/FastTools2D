@@ -1,5 +1,5 @@
-% This is a test script for the doubly periodic Stokes single-layer
-% potential
+% Investigates the timings of the spectral Ewald code. Should scale as 
+% O(N log N).
 
 close all
 clearvars

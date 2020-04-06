@@ -1,5 +1,5 @@
 % This is a test script to test the mex implementation of the spectral
-% Ewald method against matlab sums
+% Ewald method against direct matlab sums. 
 
 close all
 clearvars
@@ -32,6 +32,8 @@ n2 = sqrt(1 - n1.^2);
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
 
+% xtar = xsrc;
+% ytar = ysrc;
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 

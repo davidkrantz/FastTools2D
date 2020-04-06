@@ -1,5 +1,6 @@
-% This is a test script for the doubly periodic Stokes double-layer
-% potential
+% This is a test script to check the consistency of the Ewald method. In
+% particular we look at what happens when we change the Ewald parameters,
+% and what happens when we replicate the reference cell. 
 
 close all
 clearvars
@@ -52,7 +53,7 @@ end
 E = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E(j,j) = max(abs(u(:,j) - u(:,j)));
+        E(j,j) = max(abs(u(:,i) - u(:,j)));
     end
 end
 fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',max(max(E)));
@@ -126,13 +127,14 @@ for i = 1:length(Nb)
         E(i,j) = max(abs(u(:,i) - u(:,j)));
     end
 end
+
 fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',max(max(E)));
 
 %% Check that replicating boxes doesn't affect solution.
 % Note that for the Stresslet we have to subtract off the 0 mode, because
 % it depends on the source locations
 
-[u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, 'verbose', 1);
+[u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
 % wrap xsrc, ysrc, to reference cell. This is necessary for testing
 % purposes because the k=0 mode depends on the source locations.
@@ -159,13 +161,15 @@ Lx = 2*Lx;
 xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 
-[u3, u4] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, 'verbose', 1);
+[u3, u4] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
 u2 = u3 + 1i*u4;
 
 % Subtract off zero mode
 u2 = u2 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
 u2 = u2 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+
+
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
     max(abs(u1 - u2)));
