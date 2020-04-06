@@ -35,6 +35,6 @@ In the `tests` directory, there are several tests that can be used to verify the
 
 Ewald decomposition of two-dimensional Stokeslet and stresslet along with error estimates:
 
-Pålsson and Torberg, 2019. *An integral equation method for closely interacting surfactant-covered droplets in wall-confined Stokes flow*. <arxiv.org/pdf/1909.12581.pdf>
+Pålsson and Torberg, 2019. [*An integral equation method for closely interacting surfactant-covered droplets in wall-confined Stokes flow*](www.arxiv.org/pdf/1909.12581.pdf).
 
-Lindbo and Tornberg, 2010. *Spectrally accurate fast summation for periodic Stokes potentials*. J. Comp. Phys 229(23). <sciencedirect.com/science/article/pii/S0021999110004730>
+Lindbo and Tornberg, 2010. [*Spectrally accurate fast summation for periodic Stokes potentials*] (www.sciencedirect.com/science/article/pii/S0021999110004730). J. Comp. Phys. 229(23). 
