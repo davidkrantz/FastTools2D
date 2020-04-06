@@ -59,19 +59,16 @@ fprintf('\n     Maximum error from changing number of bins: %.5e\n',max(max(E)))
 
 [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, 'verbose', 1);
 
-% wrap xsrc, ysrc, to proper box, because they aren't translation invariant
+% wrap xsrc, ysrc, to reference cell. This is necessary for testing
+% purposes because the k=0 mode depends on the source locations.
 xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 
-% subtract off k=0 mode
-k0x = 0;
-k0y = 0;
-for i = 1:Nsrc
-    k0x = k0x + xsrc(i)*(n1(i)*f1(i) + n2(i)*f2(i))/(Lx*Ly);
-    k0y = k0y + ysrc(i)*(n1(i)*f1(i) + n2(i)*f2(i))/(Lx*Ly);
-end
+u1 = u1 + 1i*u2;
 
-u1 = u1 - k0x + 1i*(u2 - k0y);
+% Subtract off zero mode
+u1 = u1 - 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+u1 = u1 - 1i*4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
@@ -82,21 +79,18 @@ n2 = [n2; n2];
 
 Lx = 2*Lx;
 
-% wrap xsrc, ysrc, to proper box, because they aren't translation invariant
+% wrap xsrc, ysrc, to reference cell. This is necessary for testing
+% purposes because the k=0 mode depends on the source locations.
 xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 
 [u3, u4] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly, 'verbose', 1);
 
-% subtract off k=0 mode
-k0x = 0;
-k0y = 0;
-for i = 1:length(xsrc)
-    k0x = k0x + xsrc(i)*(n1(i)*f1(i) + n2(i)*f2(i))/(Lx*Ly);
-    k0y = k0y + ysrc(i)*(n1(i)*f1(i) + n2(i)*f2(i))/(Lx*Ly);
-end
+u2 = u3 + 1i*u4;
 
-u2 = u3 - k0x + 1i*(u4 - k0y);
+% Subtract off zero mode
+u2 = u2 - 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+u2 = u2 - 1i*4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 fprintf('\n     Maximum error from creating periodic replicate: %.5e\n',...
     max(abs(u1 - u2)));
