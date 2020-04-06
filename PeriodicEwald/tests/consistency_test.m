@@ -140,8 +140,8 @@ ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 u1 = u1 + 1i*u2;
 
 % Subtract off zero mode
-u1 = u1 - 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-u1 = u1 - 1i*4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+u1 = u1 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+u1 = u1 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
@@ -162,8 +162,8 @@ ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 u2 = u3 + 1i*u4;
 
 % Subtract off zero mode
-u2 = u2 - 4*pi*sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-u2 = u2 - 1i*4*pi*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+u2 = u2 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+u2 = u2 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
     max(abs(u1 - u2)));
