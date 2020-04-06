@@ -1,7 +1,6 @@
 # Doubly Periodic Spectral Ewald
 
-This library provides tools to compute sums of infinitely doubly periodic Green functions, i.e. sums of the form
-$$ u(x) = \sum$$
+This library provides tools to compute sums of infinitely doubly periodic Green functions. The current library contains the single- and double-layer potentials of the Stokes equations. 
 
 ## Compilation Instructions
 
@@ -23,3 +22,11 @@ Here you have to make sure that gcc and g++ are called instead of clang. I also 
 	export LD_LIBRARY_PATH=/usr/local/lib/
 	cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc-9 -DCMAKE_CXX_COMPILER=/usr/local/bin/g++-9 .. 
 	make
+
+## Testing
+
+In the `tests` directory, there are several tests that can be used to verify the compilation worked correctly:
+* consistency_test.m: checks that changing the Ewald parameters and enlarging the periodic box by adding replicates of the reference cell don't change the results
+* direct_sums_test.m: compares the spectral Ewald implementation to matlab direct sums of the real and Fourier parts. The Matlab direct sum does not truncate in real space, and in Fourier space it does not spread the data to a uniform grid and thus does not use FFTs
+* timings_test.m: checks the timings of the code for various numbers of source and target points. The timing should scale as O(N log N), where N is total number of points
+* stresslet_indentity_test.m: verifies the stresslet identity for points inside and outside a circle
