@@ -39,4 +39,4 @@ Pålsson and Torberg, 2019. [*An integral equation method for closely interactin
 
 For details on the spectral Ewald method in general:
 
-Lindbo and Tornberg, 2010. [*Spectrally accurate fast summation for periodic Stokes potentials*] (https://www.sciencedirect.com/science/article/pii/S0021999110004730). J. Comp. Phys. 229(23). 
+Lindbo and Tornberg, 2010. [*Spectrally accurate fast summation for periodic Stokes potentials*](https://www.sciencedirect.com/science/article/pii/S0021999110004730). J. Comp. Phys. 229(23). 
