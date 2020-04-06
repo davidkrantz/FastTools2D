@@ -40,7 +40,8 @@ u = zeros(Ntar, length(Nb));
 
 for j = 1:length(Nb)
     tic
-    [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly,'Nb', Nb(j), 'verbose', 1);
+    [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, Lx, Ly,...
+                'Nb', Nb(j), 'verbose', 1);
     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(j), toc);
     
     u(:,j) = u1 + 1i*u2;
@@ -50,7 +51,7 @@ end
 
 E = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
-    for j = 1:length(Nb)
+    for i = 1:length(Nb)
         E(j,j) = max(abs(u(:,j) - u(:,j)));
     end
 end
@@ -111,7 +112,8 @@ u = zeros(Ntar, length(Nb));
 
 for i = 1:length(Nb)
     tic
-    [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly,'Nb', Nb(i), 'verbose', 1);
+    [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2,...
+                Lx, Ly,'Nb', Nb(i), 'verbose', 1);
     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(i), toc);
     
     u(:,i) = u1 + 1i*u2;
