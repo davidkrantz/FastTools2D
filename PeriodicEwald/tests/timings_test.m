@@ -27,7 +27,7 @@ ytar = Ly*rand(Ntar,1);
 
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 10.^[3, 4, 5, 6];
+Nsrc = 2.^(8:17);
 tol = 10.^[-4, -8, -12, -16];
 
 % NB: Choosing too low a tolerance can lead to problems...
@@ -37,12 +37,7 @@ Ly = 2;
 
 times = zeros(length(tol), length(Nsrc));
 
-loglog(Nsrc, Nsrc.*log(Nsrc));
-xlabel('Number of points');
-ylabel('time (s)');
-drawnow;
-
-hold on
+close all
 
 for i = 1:length(tol)
     for j = 1:length(Nsrc)
@@ -65,13 +60,22 @@ for i = 1:length(tol)
     end
     
     loglog(Nsrc, times(i,:), '-o');
-    drawnow
+    hold on
+    xlabel('Number of points');
+    ylabel('time (s)');
+    drawnow;
     
 end
 
+loglog(Nsrc, Nsrc.*log(Nsrc)*times(end,1)/(Nsrc(1)*log(Nsrc(1))));
+
+legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', '$\mathcal{O}(N\log N)$'}...
+            , 'interpreter',  'latex', 'location', 'NW');
+
+title('Stokes Single-Layer Potential');
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 10.^[3, 4, 5, 6];
+Nsrc = 2.^(8:17);
 tol = 10.^[-4, -8, -12, -16];
 
 Lx = 1;
@@ -79,12 +83,7 @@ Ly = 2;
 
 times = zeros(length(tol), length(Nsrc));
 
-loglog(Nsrc, Nsrc.*log(Nsrc));
-xlabel('Number of points');
-ylabel('time (s)');
-drawnow;
-
-hold on
+figure();
 
 for i = 1:length(tol)
     for j = 1:length(Nsrc)
@@ -112,8 +111,16 @@ for i = 1:length(tol)
     end
     
     loglog(Nsrc, times(i,:), '-o');
-    drawnow
+    hold on
+    xlabel('Number of points');
+    ylabel('time (s)');
+    drawnow;
     
 end
         
+loglog(Nsrc, Nsrc.*log(Nsrc)*times(end,1)/(Nsrc(1)*log(Nsrc(1))));
 
+legend({'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16', '$\mathcal{O}(N\log N)$'}...
+            , 'interpreter',  'latex', 'location', 'NW');
+
+title('Stokes Double-Layer Potential');
