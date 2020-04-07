@@ -2,7 +2,7 @@
 % O(N log N).
 
 close all
-clearvars
+%clearvars
 clc
 
 initewald
@@ -54,7 +54,7 @@ for i = 1:length(tol)
         
         tic
         [u1, u2] = StokesSLP_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
-                Lx, Ly, 'tol', tol(i), 'verbose', 1, 'Nb', 9);
+                Lx, Ly, 'tol', tol(i), 'verbose', 1);
         
         times(i,j) = toc;
                 
@@ -77,7 +77,7 @@ legend({'tol = 1e-2', 'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16',.
 title('Stokes Single-Layer Potential');
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 2.^(8:17);
+Nsrc = 2.^(8:19);
 tol = 10.^[-2, -4, -8, -12, -16];
 
 Lx = 1;
@@ -106,7 +106,7 @@ for i = 1:length(tol)
         
         tic
         [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, ...
-            f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1, 'Nb', 9);
+            f1, f2, Lx, Ly, 'tol', tol(i), 'verbose', 1);
         
         times(i,j) = toc;
               
