@@ -2,9 +2,9 @@
 % prescribe a density f = e_i (i = 1,2). Then if u(x) is given by the
 % double-layer potential, the following identity holds, even for periodic
 % sums:
-% u(x) = -1, x inside circle, 
+% u(x) = -e_i, x inside circle, 
 %         0, x outside circle,
-%        -1/2, x on the circle.
+%        -e_i/2, x on the circle.
 % We will consider only the first two cases, and look at the average u at 
 % a circle of points inside and another one outside the original circle. 
 
