@@ -16,8 +16,8 @@ fprintf('Checking consistency of single-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 10000;
-Ntar = 10000;
+Nsrc = 1000;
+Ntar = 1000;
 
 Lx = 1;
 Ly = 2;
@@ -33,8 +33,7 @@ ysrc = Ly*rand(Nsrc,1);
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 
-%% Compute solution with Spectral Ewald, try with a number of bins
-
+%% Compute solution with Spectral Ewald
 Nb = [3, 9, 27];
 
 u = zeros(Ntar, length(Nb));
@@ -56,7 +55,8 @@ for j = 1:length(Nb)
         E(j,j) = max(abs(u(:,i) - u(:,j)));
     end
 end
-fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',max(max(E)));
+fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',...
+    max(max(E)));
 
 %% Check that replicating boxes doesn't affect solution
 
@@ -84,8 +84,8 @@ fprintf('Checking consistency of double-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 10000;
-Ntar = 10000;
+Nsrc = 1000;
+Ntar = 1000;
 
 Lx = 1;
 Ly = 2;
@@ -128,7 +128,8 @@ for i = 1:length(Nb)
     end
 end
 
-fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',max(max(E)));
+fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
+    max(max(E)));
 
 %% Check that replicating boxes doesn't affect solution.
 % Note that for the Stresslet we have to subtract off the 0 mode, because
@@ -168,8 +169,6 @@ u2 = u3 + 1i*u4;
 % Subtract off zero mode
 u2 = u2 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
 u2 = u2 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-
-
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
     max(abs(u1 - u2)));
