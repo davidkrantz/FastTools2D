@@ -16,8 +16,8 @@ fprintf('Checking consistency of single-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 1000;
-Ntar = 1000;
+Nsrc = 10000;
+Ntar = 10000;
 
 Lx = 1;
 Ly = 2;
@@ -34,6 +34,13 @@ xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 
 %% Compute solution with Spectral Ewald
+% Here we change Nb, the number of points in each box in the real space
+% sum. This controls the cutoff radius in real space, and that in turn
+% changes the Ewald parameter xi, and the cutoff mode in Fourier space. 
+% Changing Nb should not change the result, but it will have an impact on
+% the relative times to compute the real space and Fourier sums. This
+% parameter can be studied to find an optimum balance.
+
 Nb = [3, 9, 27];
 
 u = zeros(Ntar, length(Nb));
@@ -84,8 +91,8 @@ fprintf('Checking consistency of double-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 1000;
-Ntar = 1000;
+Nsrc = 10000;
+Ntar = 10000;
 
 Lx = 1;
 Ly = 2;
@@ -146,7 +153,7 @@ u1 = u1 + 1i*u2;
 
 % Subtract off zero mode
 u1 = u1 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-u1 = u1 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+u1 = u1 + 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
@@ -168,7 +175,7 @@ u2 = u3 + 1i*u4;
 
 % Subtract off zero mode
 u2 = u2 + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-u2 = u2 + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+u2 = u2 + 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
     max(abs(u1 - u2)));
