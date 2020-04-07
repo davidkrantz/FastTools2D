@@ -16,7 +16,7 @@ function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc,...
 %       Ly, the length of the periodic box in the y direction
 %       vargargin can contain any or all of the following:
 %         'P', integer giving support points in each direction (default 24)
-%         'Nb', average number of points per box (default 5*log(#pts))
+%         'Nb', average number of points per box (default 5*log2(#pts))
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
@@ -28,9 +28,9 @@ function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc,...
 npts = length(xsrc)+length(xtar);
 
 % set default parameter values
-P = 24;                   % support points in each direction
-Nb = 5*round(log(npts));  % average number of points per box for real space sum
-tol = 1e-16;              % tolerance, used to get parameters from estimates
+P = 24;                    % support points in each direction
+Nb = 5*round(log2(npts));  % average number of points per box for real space sum
+tol = 1e-16;               % tolerance, used to get parameters from estimates
 verbose = 0;
 
 if nargin > 8
