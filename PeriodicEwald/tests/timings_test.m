@@ -2,32 +2,14 @@
 % O(N log N).
 
 close all
-%clearvars
+clearvars
 clc
 
 initewald
 
-%% Set up data
-Nsrc = 10000;
-Ntar = 10000;
-
-Lx = 2*pi;
-Ly = 2*pi;
-
-% Two components of the density function
-f1 = 10*rand(Nsrc,1);
-f2 = 10*rand(Nsrc,1);
-
-% Source and target loccations
-xsrc = Lx*rand(Nsrc,1);
-ysrc = Ly*rand(Nsrc,1);
-
-xtar = Lx*rand(Ntar,1);
-ytar = Ly*rand(Ntar,1);
-
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 2.^(8:19);
+Nsrc = 2.^(8:20);
 tol = 10.^[-2, -4, -8, -12, -16];
 
 % NB: Choosing too low a tolerance can lead to problems...
@@ -77,7 +59,7 @@ legend({'tol = 1e-2', 'tol = 1e-4', 'tol = 1e-8', 'tol = 1e-12', 'tol = 1e-16',.
 title('Stokes Single-Layer Potential');
 %% Check that timings scale as O(N Log N)
 
-Nsrc = 2.^(8:19);
+Nsrc = 2.^(8:20);
 tol = 10.^[-2, -4, -8, -12, -16];
 
 Lx = 1;
