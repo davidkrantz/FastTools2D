@@ -10,5 +10,8 @@ matlab_add_mex(
 
 matlab_add_mex(
 	NAME mex_stokes_slp_kspace
-	SRC mex_stokes_slp_kspace.cpp
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_kspace.cpp
 )
+
+target_link_libraries(mex_stokes_slp_real gomp)
+target_link_libraries(mex_stokes_slp_kspace gomp)
