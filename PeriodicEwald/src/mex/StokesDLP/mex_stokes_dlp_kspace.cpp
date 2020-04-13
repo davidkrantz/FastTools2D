@@ -28,8 +28,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     int Nsrc = mxGetN(prhs[0]);
     double* ptar = mxGetPr(prhs[1]);  
     int Ntar = mxGetN(prhs[1]);
-    
-    
+     
     //The Ewald parameter xi
     double xi = mxGetScalar(prhs[2]);
     //The splitting parameter eta
@@ -52,8 +51,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     int P = static_cast<int>(mxGetScalar(prhs[11]));
     
     //The grid spacing
-    double h_x = L_x/M_x;
-    double h_y = L_y/M_y;
+    double h = L_x/M_x;
     
     //---------------------------------------------------------------------
     //Step 1 : Spreading to the grid
@@ -77,7 +75,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     //This is the precomputable part of the fast Gaussian gridding.
     double* e1 = new double[P+1];
-    double tmp = -2*xi*xi/eta*h_x*h_y;
+    double tmp = -2*xi*xi/eta*h*h;
     for(int j = -P/2;j<=P/2;j++)
         e1[j+P/2] = exp(tmp*j*j);
     
@@ -98,60 +96,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         //The Gaussian bells are translation invariant. We exploit this 
         //fact to avoid blow-up of the terms and the numerical instability
         //that follows. (px,py) is the center of the bell with the original
-        //grid-alignment but close to the origin.
+        //grid-alignment but close to the origin.        
+        double xsrc = psrc[2*k];
+	double ysrc = psrc[2*k+1];
+
+        double px = xsrc - h*floor(xsrc/h);
+        double py = ysrc - h*floor(ysrc/h);
+
+	if (fabs(px) < TOL)
+            px = 0;
         
-        double px = psrc[2*k] - h_x*floor(psrc[2*k]/h_x);
-        double py = psrc[2*k+1] - h_y*floor(psrc[2*k+1]/h_y);
+        if (fabs(py) < TOL)
+            py = 0;
 
         double Lhalf_x = static_cast<double>(L_x/2.0);
         double Lhalf_y = static_cast<double>(L_y/2.0);
         
-        //(mx,my) is the center grid point in H1 and H2.        
-        int mx;
-        double tmpp = static_cast<double>((psrc[2*k]+Lhalf_x)/h_x);
-        int tmppint = static_cast<int>(floor(tmpp));
-        int tmppint2 = static_cast<int>(round(tmpp));
-        int tmppint3 = static_cast<int>(ceil(tmpp-1));
-        if(fabs(tmpp-tmppint2)<TOL) {
-            tmppint = tmppint2;
-            mx = static_cast<int>(tmppint-P/2);
-        }else
-        {
-            if(fabs(px)>TOL)
-                mx = static_cast<int>(tmppint3-P/2);
-            else
-                mx = static_cast<int>(tmppint-P/2);
-        }
+        //(mx,my) is the center grid point in H1 and H2.
+        int mx = static_cast<int>(floor((xsrc+Lhalf_x)/h) - P/2);
+        int my = static_cast<int>(floor((ysrc+Lhalf_y)/h) - P/2);
         
-        int my;
-        double tmppy = static_cast<double>((psrc[2*k+1]+Lhalf_y)/h_y);
-        int tmppinty = static_cast<int>(floor(tmppy));
-        int tmppint2y = static_cast<int>(round(tmppy));
-        int tmppint3y = static_cast<int>(ceil(tmppy-1));
-        if(fabs(tmppy-tmppint2y)<TOL) {
-            tmppinty = tmppint2y;
-            my = static_cast<int>(tmppinty-P/2);            
-        }
-        else
-        {
-            if(fabs(py)>TOL)
-                my = static_cast<int>(tmppint3y-P/2);
-            else
-                my = static_cast<int>(tmppinty-P/2);
-        }
-        
-        if (fabs(px - h_x) < TOL)
-            px = 0;
-        
-        if (fabs(py - h_y) < TOL)
-            py = 0;
+	// correct for cases where target is very close to a grid node
+	if (px == 0 && remainder((xsrc+Lhalf_x)/h - P/2, 1) < 0)
+		mx++;
+
+	if (py == 0 && remainder((ysrc+Lhalf_y)/h - P/2, 1) < 0)
+		my++;
         
         //Some auxillary quantities for the fast Gaussian gridding.
         double tmp = -2*xi*xi/eta;
         double ex = exp(tmp*(px*px+py*py + 2*w*px));
         double e4y = exp(2*tmp*w*py);
-        double e3x = exp(-2*tmp*h_x*px);
-        double e3y = exp(-2*tmp*h_y*py);
+        double e3x = exp(-2*tmp*h*px);
+        double e3y = exp(-2*tmp*h*py);
         
         //We add the Gaussians column by column, and lock the one we are
         //working on to avoid race conditions.
@@ -378,58 +355,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         //fact to avoid blow-up of the terms and the numerical instability
         //that follows. (px,py) is the center of the bell with the original
         //grid-alignment but close to the origin.
-        double px = ptar[2*k] - h_x*floor(ptar[2*k]/h_x);
-        double py = ptar[2*k+1] - h_y*floor(ptar[2*k+1]/h_y);
+        double xtar = ptar[2*k];
+	double ytar = ptar[2*k+1];
+
+        double px = xtar - h*floor(xtar/h);
+        double py = ytar - h*floor(ytar/h);
+
+	if (fabs(px) < TOL)
+            px = 0;
         
+        if (fabs(py) < TOL)
+            py = 0;
+
         double Lhalf_x = static_cast<double>(L_x/2.0);
         double Lhalf_y = static_cast<double>(L_y/2.0);
         
         //(mx,my) is the center grid point in H1 and H2.
-        int mx;
-        double tmpp = static_cast<double>((ptar[2*k]+Lhalf_x)/h_x);
-        int tmppint = static_cast<int>(floor(tmpp));
-        int tmppint2 = static_cast<int>(round(tmpp));
-        int tmppint3 = static_cast<int>(ceil(tmpp-1));
-        if(fabs(tmpp-tmppint2)<TOL) {
-            tmppint = tmppint2;
-            mx = static_cast<int>(tmppint-P/2);
-        }else
-        {
-            if(fabs(px)>TOL) 
-                mx = static_cast<int>(tmppint3-P/2);
-            else
-                mx = static_cast<int>(tmppint-P/2);           
-        }
+        int mx = static_cast<int>(floor((xtar+Lhalf_x)/h) - P/2);
+        int my = static_cast<int>(floor((ytar+Lhalf_y)/h) - P/2);
         
-        int my;
-        double tmppy = static_cast<double>((ptar[2*k+1]+Lhalf_y)/h_y);
-        int tmppinty = static_cast<int>(floor(tmppy));
-        int tmppint2y = static_cast<int>(round(tmppy));
-        int tmppint3y = static_cast<int>(ceil(tmppy-1));
-        if(fabs(tmppy-tmppint2y)<TOL) {
-            tmppinty = tmppint2y;
-            my = static_cast<int>(tmppinty-P/2);            
-        }
-        else
-        {
-            if(fabs(py)>TOL)
-                my = static_cast<int>(tmppint3y-P/2);                
-            else 
-                my = static_cast<int>(tmppinty-P/2);
-            
-        }
-        
-        if (fabs(px - h_x) < TOL)
-            px = 0;
-        
-        if (fabs(py - h_y) < TOL)
-            py = 0;
+	// correct for cases where target is very close to a grid node
+	if (px == 0 && remainder((xtar+Lhalf_x)/h - P/2, 1) < 0)
+		mx++;
+
+	if (py == 0 && remainder((ytar+Lhalf_y)/h - P/2, 1) < 0)
+		my++;
         
         double tmp = -2*xi*xi/eta;
         double ex = exp(tmp*(px*px+py*py + 2*w*px));
         double e4y = exp(2*tmp*w*py);
-        double e3x = exp(-2*tmp*h_x*px);
-        double e3y = exp(-2*tmp*h_y*py);
+        double e3x = exp(-2*tmp*h*px);
+        double e3y = exp(-2*tmp*h*py);
         
         //If there is no wrap-around due to periodicity for this gaussian,
         //we use a faster loop. We go column by column, but as the 
@@ -472,7 +428,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         }
         
         tmp = 4*xi*xi/eta;
-        tmp = tmp*tmp*h_x*h_y/pi;
+        tmp = tmp*tmp*h*h/pi;
         Tk[2*k] *= tmp / (4*pi);
         Tk[2*k+1] *= tmp / (4*pi);
 
