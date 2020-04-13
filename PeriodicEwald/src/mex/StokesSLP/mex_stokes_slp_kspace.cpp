@@ -2,6 +2,7 @@
 #include <math.h>
 #include <omp.h>
 #include <string.h>
+#include "ewald_tools.h"
 #define pi 3.1415926535897932385
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
@@ -29,19 +30,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* f = mxGetPr(prhs[4]);
     
     //Number of grid intervals in each direction
-    int M_x = static_cast<int>(mxGetScalar(prhs[5]));
-    int M_y = static_cast<int>(mxGetScalar(prhs[6]));
+    int Mx = static_cast<int>(mxGetScalar(prhs[5]));
+    int My = static_cast<int>(mxGetScalar(prhs[6]));
     
     //The length of the domain
-    double L_x = mxGetScalar(prhs[7]);
-    double L_y = mxGetScalar(prhs[8]);
+    double Lx = mxGetScalar(prhs[7]);
+    double Ly = mxGetScalar(prhs[8]);
     //The width of the Gaussian bell curves. (unnecessary?)
     double w = mxGetScalar(prhs[9]);
     //The width of the Gaussian bell curves on the grid.
     int P = static_cast<int>(mxGetScalar(prhs[10]));
 
     //The grid spacing
-    double h = L_x/M_x;
+    double h = Lx/Mx;
 
     //---------------------------------------------------------------------
     //Step 1 : Spreading to the grid
@@ -54,9 +55,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //The function H on the grid. We need to have these as Matlab arrays
     //since we call Matlab's in-built fft2 to compute the 2D FFT.
     mxArray *fft2rhs[2],*fft2lhs[2];
-    fft2rhs[0] = mxCreateDoubleMatrix(M_y, M_x, mxREAL);
+    fft2rhs[0] = mxCreateDoubleMatrix(My, Mx, mxREAL);
     double* H1 = mxGetPr(fft2rhs[0]);
-    fft2rhs[1] = mxCreateDoubleMatrix(M_y, M_x, mxREAL);
+    fft2rhs[1] = mxCreateDoubleMatrix(My, Mx, mxREAL);
     double* H2 = mxGetPr(fft2rhs[1]);
 
     //This is the precomputable part of the fast Gaussian gridding.
@@ -71,8 +72,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //operation. We use the simple approach of locking the column of the
     //matrix we are working on currently. This might not be optimal but it
     //is simple to implement.
-    omp_lock_t* locks = new omp_lock_t[M_x];
-    for(int j = 0;j<M_x;j++)
+    omp_lock_t* locks = new omp_lock_t[Mx];
+    for(int j = 0;j<Mx;j++)
         omp_init_lock(&locks[j]);
 
     //We use OpenMP for simple parallelization.
@@ -87,28 +88,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	double xsrc = psrc[2*k];
 	double ysrc = psrc[2*k+1];
 
-        double px = xsrc - h*floor(xsrc/h);
-        double py = ysrc - h*floor(ysrc/h);
+	int mx, my;
+	double px, py;
 
-	if (fabs(px) < TOL)
-            px = 0;
-        
-        if (fabs(py) < TOL)
-            py = 0;
-
-        double Lhalf_x = static_cast<double>(L_x/2.0);
-        double Lhalf_y = static_cast<double>(L_y/2.0);
-        
-        //(mx,my) is the center grid point in H1 and H2.
-        int mx = static_cast<int>(floor((xsrc+Lhalf_x)/h) - P/2);
-        int my = static_cast<int>(floor((ysrc+Lhalf_y)/h) - P/2);
-        
-	// correct for cases where target is very close to a grid node
-	if (px == 0 && remainder((xsrc+Lhalf_x)/h - P/2, 1) < 0)
-		mx++;
-
-	if (py == 0 && remainder((ysrc+Lhalf_y)/h - P/2, 1) < 0)
-		my++;
+	FindClosestNode(xsrc, ysrc, Lx, Ly, h, P, &mx, &my, &px, &py); 
         
         //Some auxillary quantities for the fast Gaussian gridding.
         double tmp = -2*xi*xi/eta;
@@ -122,9 +105,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         //working on to avoid race conditions.
         for(int x = 0;x<P+1;x++) {
             double ey = ex*e4y*e1[x];
-            int xidx = ((x+mx+M_x)%M_x)*M_y;
-            omp_set_lock(&locks[(x+mx+M_x)%M_x]);
-            if(my >= 0 && my < M_y-P-1) {
+            int xidx = ((x+mx+Mx)%Mx)*My;
+            omp_set_lock(&locks[(x+mx+Mx)%Mx]);
+            if(my >= 0 && my < My-P-1) {
                 int idx = my+xidx;
                 for(int y = 0;y<P+1;y++,idx++) {
                     double tmp = ey*e1[y];
@@ -136,21 +119,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             }else{
                 for(int y = 0;y<P+1;y++) {
                     double tmp = ey*e1[y];
-                    int idx = ((y+my+M_y)%M_y)+xidx;
+                    int idx = ((y+my+My)%My)+xidx;
                     
                     H1[idx] += tmp*f[2*k];
                     H2[idx] += tmp*f[2*k+1];
                     ey *= e3y;
                 }
             }
-            omp_unset_lock(&locks[(x+mx+M_x)%M_x]);
+            omp_unset_lock(&locks[(x+mx+Mx)%Mx]);
             ex *= e3x;
         }
     }
 
     //Spreading is the only part of the k-space sum that needs locks, so
     //get rid of them.
-    for(int j = 0;j<M_x;j++)
+    for(int j = 0;j<Mx;j++)
         omp_destroy_lock(&locks[j]);
     delete locks;
 
@@ -175,7 +158,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* Hhat2_re = mxGetPr(fft2lhs[1]);
     double* Hhat2_im = mxGetPi(fft2lhs[1]);
 
-    mwSize cs = M_x*M_y;
+    mwSize cs = Mx*My;
 
     //We cannot assume that both the real and imaginary part of the
     //Fourier transforms are non-zero.
@@ -206,15 +189,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //exponentials, but as this loop accounts for a few percent of the
     //total runtime, this hardly seems worth the extra work.
  #pragma omp parallel for
-    for(int j = 0;j<M_x;j++) {
-        int ptr = j*M_y;
+    for(int j = 0;j<Mx;j++) {
+        int ptr = j*My;
         double k1;
-        if(j <= M_x/2)
-            k1 = 2.0*pi/L_x*j;
+        if(j <= Mx/2)
+            k1 = 2.0*pi/Lx*j;
         else
-            k1 = 2.0*pi/L_x*(j-M_x);
-        for(int k = 0;k<=M_y/2;k++,ptr++) {
-            double k2 = 2.0*pi/L_y*k;
+            k1 = 2.0*pi/Lx*(j-Mx);
+        for(int k = 0;k<=My/2;k++,ptr++) {
+            double k2 = 2.0*pi/Ly*k;
             double Ksq = k1*k1+k2*k2;
             double e = (1.0/(Ksq*Ksq)+0.25/(Ksq*xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
 
@@ -226,8 +209,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             Hhat2_im[ptr] = k1*(k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr])*e;
             Hhat1_im[ptr] = tmp*e;
         }
-        for(int k = 0;k<M_y/2-1;k++,ptr++) {
-            double k2 = 2.0*pi/L_y*(k-M_y/2+1);
+        for(int k = 0;k<My/2-1;k++,ptr++) {
+            double k2 = 2.0*pi/Ly*(k-My/2+1);
             double Ksq = k1*k1+k2*k2;
             double e = (1.0/(Ksq*Ksq)+0.25/(Ksq*xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
 
@@ -260,9 +243,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* Ht2 = mxGetPr(fft2rhs[1]);
 
     if(Ht1 == NULL)
-        Ht1 = new double[M_x*M_y];
+        Ht1 = new double[Mx*My];
     if(Ht2 == NULL)
-        Ht2 = new double[M_x*M_y];
+        Ht2 = new double[Mx*My];
 
     //Get rid of the Hhat1 and Hhat2 arrays. They are no longer needed.
     mxDestroyArray(fft2lhs[0]);
@@ -291,28 +274,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	double xtar = ptar[2*k];
 	double ytar = ptar[2*k+1];
 
-        double px = xtar - h*floor(xtar/h);
-        double py = ytar - h*floor(ytar/h);
+	int mx, my;
+	double px, py;
 
-	if (fabs(px) < TOL)
-            px = 0;
-        
-        if (fabs(py) < TOL)
-            py = 0;
-
-        double Lhalf_x = static_cast<double>(L_x/2.0);
-        double Lhalf_y = static_cast<double>(L_y/2.0);
-        
-        //(mx,my) is the center grid point in H1 and H2.
-        int mx = static_cast<int>(floor((xtar+Lhalf_x)/h) - P/2);
-        int my = static_cast<int>(floor((ytar+Lhalf_y)/h) - P/2);
-        
-	// correct for cases where target is very close to a grid node
-	if (px == 0 && remainder((xtar+Lhalf_x)/h - P/2, 1) < 0)
-		mx++;
-
-	if (py == 0 && remainder((ytar+Lhalf_y)/h - P/2, 1) < 0)
-		my++;
+	FindClosestNode(xtar, ytar, Lx, Ly, h, P, &mx, &my, &px, &py); 
 
         double tmp = -2*xi*xi/eta;
         double ex = exp(tmp*(px*px+py*py + 2*w*px));
@@ -320,13 +285,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double e3x = exp(-2*tmp*h*px);
         double e3y = exp(-2*tmp*h*py);
 
- //       mexPrintf("tmp = %3.3g, ex = %3.3g, ex4y = %3.3g, e3x = %3.3g, e3y = %3.3g\n", tmp, ex, e4y, e3x, e3y);
         //If there is no wrap-around due to periodicity for this gaussian,
         //we use a faster loop. We go column by column, but as the
         //matrices Ht1 and Ht2 are only read from we have no need for
         //locks and such.
-        if(mx >= 0 && my >= 0 && mx < M_x-P-1 && my < M_y-P-1) {
-            int idx = mx*M_y+my;
+        if(mx >= 0 && my >= 0 && mx < Mx-P-1 && my < My-P-1) {
+            int idx = mx*My+my;
             for(int x = 0;x<P+1;x++) {
                 double ey = ex*e4y*e1[x];
 
@@ -338,17 +302,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     ey *= e3y;
                 }
                 ex *= e3x;
-                idx += M_y-P-1;
+                idx += My-P-1;
             }
         
         }else{
             
             for(int x = 0;x<P+1;x++) {
                 double ey = ex*e4y*e1[x];
-                int xidx = ((x+mx+M_x)%M_x)*M_y;
+                int xidx = ((x+mx+Mx)%Mx)*My;
                 for(int y = 0;y<P+1;y++) {
                     double tmp = ey*e1[y];
-                    int idx = ((y+my+M_y)%M_y)+xidx;
+                    int idx = ((y+my+My)%My)+xidx;
                     uk[2*k] += tmp*Ht1[idx];
                     uk[2*k+1] += tmp*Ht2[idx];
                     ey *= e3y;

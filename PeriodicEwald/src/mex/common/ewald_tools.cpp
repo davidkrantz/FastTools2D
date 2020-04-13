@@ -78,3 +78,37 @@ void Assign(double *psrc, double *ptar, double Lx, double Ly, int nsrc,
     delete in_box_tar;
     delete particlenum_in_box_tar;   
 }
+
+/*------------------------------------------------------------------------
+ *This function finds the node to begin the Gaussian blur
+ *------------------------------------------------------------------------
+ */
+void FindClosestNode(double x, double y, double Lx, double Ly, double h, int P, 
+			int* mx, int* my, double* px, double* py){
+	
+	double TOL = 1e-13;
+
+        *px = x - h*floor(x/h);
+        *py = y - h*floor(y/h);
+
+        double Lhalf_x = static_cast<double>(Lx/2.0);
+        double Lhalf_y = static_cast<double>(Ly/2.0);
+        
+        //(mx,my) is the center grid point in H1 and H2.
+        *mx = static_cast<int>(floor((x+Lhalf_x)/h) - P/2);
+        *my = static_cast<int>(floor((y+Lhalf_y)/h) - P/2);
+
+	// correct for cases where target is very close to a grid node
+
+	if (fabs(*px) < TOL || fabs(*px - h) < TOL)
+            *px = 0;
+        
+        if (fabs(*py) < TOL || fabs(*py - h) < TOL)
+            *py = 0;
+
+	if (*px == 0 && remainder((x+Lhalf_x)/h - P/2, 1) < 0)
+		(*mx)++;
+
+	if (*py == 0 && remainder((y+Lhalf_y)/h - P/2, 1) < 0)
+		(*my)++;
+}
