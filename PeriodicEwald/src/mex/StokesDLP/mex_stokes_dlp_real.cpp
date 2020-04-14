@@ -4,7 +4,7 @@
 #include <pmmintrin.h>
 
 #include "mm_mxmalloc.h"
-#include <ewald_tools.h>
+#include "ewald_tools.h"
 
 #define pi 3.1415926535897932385
 
