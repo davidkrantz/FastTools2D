@@ -5,15 +5,15 @@ function [u1, u2, ur, uk, xi] = StokesSLP_ewald_2p(xsrc, ysrc,...
 %
 % Input:
 %       xsrc, x component of source points
-%       ytar, y component of source points 
-%       xsrc, x component of target points
+%       ysrc, y component of source points 
+%       xtar, x component of target points
 %       ytar, y component of target points 
 %       f1, x component of density function
 %       f2, y component of density function
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
 %         'P', integer giving support points in each direction (default 24)
-%         'Nb', average number of points per box (default 5*log2(#pts))
+%         'Nb', average number of points per box (default P*log2(#pts)/2)
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
@@ -26,12 +26,17 @@ function [u1, u2, ur, uk, xi] = StokesSLP_ewald_2p(xsrc, ysrc,...
 
 npts = length(xsrc)+length(xtar);
 
-% set default parameter values
-P = 24;                     % support points in each direction
-Nb = 5*round(log2(npts)); % average number of points per box for real space sum
-tol = 1e-16;                % tolerance, used to get parameters from estimates
+%% set default parameter values 
+% support points in each direction
+P = 24;                    
+% average number of points per box for real space sum
+Nb = min(P*round(log2(npts)/2), npts/4);
+% tolerance, used to get parameters from estimates
+tol = 1e-16;  
+% print diagnostic information
 verbose = 0;
 
+%% read in optional input parameters
 if nargin > 8
     % Go through all other input arguments and assign parameters
     jv = 1;
@@ -127,8 +132,8 @@ end
 
 u = ur + uk;
 
-u1 = u(1,:);
-u2 = u(2,:);
+u1 = u(1,:)';
+u2 = u(2,:)';
 
 end
 
@@ -149,8 +154,8 @@ f = @(k) sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3*k))*exp(-k^2/(4*xi^2)) - tol;
 fp = @(k) -sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3))*exp(-k^2/(4*xi^2))*...
                 (0.5*k^(-1.5) + sqrt(1/k)*2*k/(4*xi^2));
 
-kdiff = 1;
-while abs(kdiff) > 1e-2
+%kdiff = 1;
+while abs(f(k)) > tol
     if it > maxit
         disp("Couldn't find suitable k! Break")
         break;
@@ -181,8 +186,8 @@ f = @(x) sqrt(Q * pi/(4*Lx*Ly*x))*exp(-x^2*rc^2) - tol;
 fp = @(x) -sqrt(Q*pi/(4*Lx*Ly))*exp(-x^2*rc^2)*(0.5*x^(-1.5)+...
                 2*rc^2*x*sqrt(1/x));
 
-xdiff = 1;
-while abs(xdiff) > 1e-2
+%xdiff = 1;
+while abs(f(x)) > tol
     if it > maxit
         disp("Couldn't find suitable xi! Break")
         break;
