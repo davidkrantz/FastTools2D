@@ -62,6 +62,13 @@ end
 
 % TO DO: ADD CHECKS ON INPUT DATA HERE
 
+% FIX for matlab 2018/2019
+n1 = n1 - eps;
+n2 = sqrt(1 - n1.^2).*sign(n2);
+
+f1 = f1 + eps;
+f2 = f2 + eps;
+
 if verbose
     fprintf("*********************************************************\n");
     fprintf("SPECTRAL EWALD FOR THE STOKES DOUBLE-LAYER POTENTIAL\n\n")
