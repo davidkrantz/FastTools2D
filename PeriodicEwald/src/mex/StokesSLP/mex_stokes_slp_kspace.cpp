@@ -66,8 +66,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     for(int j = -P/2;j<=P/2;j++)
         e1[j+P/2] = exp(tmp*j*j);
 
-    double TOL = 1e-13;
-
     //Spreading the sources to the grid is not a completely parallel
     //operation. We use the simple approach of locking the column of the
     //matrix we are working on currently. This might not be optimal but it
