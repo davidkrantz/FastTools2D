@@ -104,7 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	int mx, my;
 	double px, py;
 
-	FindClosestNode(xsrc, ysrc, Lx, Ly, h, P, &mx, &my, &px, &py, 0); 
+	FindClosestNode(xsrc, ysrc, Lx, Ly, h, P, &mx, &my, &px, &py); 
 			
         //Some auxillary quantities for the fast Gaussian gridding.
         double tmp = -2*xi*xi/eta;
