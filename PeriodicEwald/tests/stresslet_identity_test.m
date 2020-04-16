@@ -2,9 +2,9 @@
 % prescribe a density f = e_i (i = 1,2). Then if u(x) is given by the
 % double-layer potential, the following identity holds, even for periodic
 % sums:
-% u(x) = -e_i, x inside circle, 
+% u(x) = e_i, x inside circle, 
 %         0, x outside circle,
-%        -e_i/2, x on the circle.
+%        e_i/2, x on the circle.
 % We will consider only the first two cases, and look at the average u at 
 % a circle of points inside and another one outside the original circle. 
 
@@ -61,7 +61,7 @@ ytar(end/2+1:end) = r_out*sin(theta);
 
 fprintf("f1 = 1, f2 = 0\n");
 fprintf("error in mean interior solution: %3.3e\n",...
-    norm(u1(1:end/2) + 1i*u2(1:end/2) + 1));
+    norm(u1(1:end/2) + 1i*u2(1:end/2) - 1));
 fprintf("error in mean exterior solution %3.3e\n",...
     norm(u1(end/2+1:end) + 1i*u2(end/2+1:end))); 
 
@@ -73,7 +73,7 @@ f2 = hsrc*ones(Nsrc,1);
 
 fprintf("\nf1 = 0, f2 = 1\n");
 fprintf("error in mean interior solution: %3.3e\n",...
-    norm(u1(1:end/2) + 1i*u2(1:end/2) + 1i));
+    norm(u1(1:end/2) + 1i*u2(1:end/2) - 1i));
 fprintf("error in mean exterior solution %3.3e\n",...
     norm(u1(end/2+1:end) + 1i*u2(end/2+1:end))); 
 
