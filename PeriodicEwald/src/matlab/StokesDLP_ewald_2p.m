@@ -16,7 +16,7 @@ function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc,...
 %       Ly, the length of the periodic box in the y direction
 %       vargargin can contain any or all of the following:
 %         'P', integer giving support points in each direction (default 24)
-%         'Nb', average number of points per box (default P*log2(#pts)/2)
+%         'Nb', average number of points per box (default P*log2(#pts))
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
@@ -31,7 +31,7 @@ npts = length(xsrc)+length(xtar);
 % support points in each direction
 P = 24;                    
 % average number of points per box for real space sum
-Nb = min(P*round(log2(npts)/2), npts/4);
+Nb = min(P*round(log2(npts)), npts/4);
 % tolerance, used to get parameters from estimates
 tol = 1e-16;  
 % print diagnostic information
@@ -62,12 +62,17 @@ end
 
 % TO DO: ADD CHECKS ON INPUT DATA HERE
 
-% FIX for matlab 2018/2019
+%% Fix for matlab 2018/2019, not sure why this is necessary, but it seems to
+% work.
 n1 = n1 - eps;
+if n1 < -1
+    n1 = n1 + 2*eps;
+end
 n2 = sqrt(1 - n1.^2).*sign(n2);
 
 f1 = f1 + eps;
 f2 = f2 + eps;
+%%
 
 if verbose
     fprintf("*********************************************************\n");
