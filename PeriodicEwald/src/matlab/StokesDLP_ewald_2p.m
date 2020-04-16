@@ -62,16 +62,24 @@ end
 
 % TO DO: ADD CHECKS ON INPUT DATA HERE
 
-%% Fix for matlab 2018/2019, not sure why this is necessary, but it seems to
-% work.
-n1 = n1 - eps;
-if n1 < -1
-    n1 = n1 + 2*eps;
+%% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
+% to work. 
+%
+% Check to see first if it's necessary, for Matlab 2017a at least it isn't.
+%
+% IMPORTANT NOTE: This fix may cause GMRES to stall at
+% around 1e-12! Some Ewald tests may also lose accuracy.
+v=ver('MATLAB');
+if v.Release~="(R2017a)"
+    n1 = n1 - eps;
+    if n1 < -1
+        n1 = n1 + 2*eps;
+    end
+    n2 = sqrt(1 - n1.^2).*sign(n2);
+    
+    f1 = f1 + eps;
+    f2 = f2 + eps;
 end
-n2 = sqrt(1 - n1.^2).*sign(n2);
-
-f1 = f1 + eps;
-f2 = f2 + eps;
 %%
 
 if verbose
@@ -149,7 +157,7 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
-u = ur + uk;
+u = -(ur + uk); % negative sign to match convention
 
 u1 = u(1,:)';
 u2 = u(2,:)';
