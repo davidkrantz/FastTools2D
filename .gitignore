@@ -5,6 +5,7 @@
 *.out
 *~
 *.mexa64
+*.txt
 PeriodicEwald/src/bin/*
 PeriodicEwald/src/build/*
 FMM/src/StokesSLP/lib/*
