@@ -13,7 +13,7 @@ function [u1, u2, ur, uk, xi] = StokesSLP_ewald_2p(xsrc, ysrc,...
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
 %         'P', integer giving support points in each direction (default 24)
-%         'Nb', average number of points per box (default P*log2(#pts)/2)
+%         'Nb', average number of points per box (default P*log2(#pts))
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
@@ -30,7 +30,7 @@ npts = length(xsrc)+length(xtar);
 % support points in each direction
 P = 24;                    
 % average number of points per box for real space sum
-Nb = min(P*round(log2(npts)/2), npts/4);
+Nb = min(P*round(log2(npts)), npts/4);
 % tolerance, used to get parameters from estimates
 tol = 1e-16;  
 % print diagnostic information
