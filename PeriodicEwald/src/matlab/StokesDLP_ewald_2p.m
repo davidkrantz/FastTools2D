@@ -66,19 +66,17 @@ end
 % to work. 
 %
 % Check to see first if it's necessary, for Matlab 2017a at least it isn't.
-%
-% IMPORTANT NOTE: This fix may cause GMRES to stall at around 1e-12! Some 
-% Ewald tests may also lose accuracy.
 v=ver('MATLAB');
 if v.Release~="(R2017a)"
-    n1 = n1 - eps;
+    offset = 1e-60;
+    n1 = n1 - offset;
     if n1 < -1
-        n1 = n1 + 2*eps;
+        n1 = n1 + 2*offset;
     end
     n2 = sqrt(1 - n1.^2).*sign(n2);
     
-    f1 = f1 + eps;
-    f2 = f2 + eps;
+    f1 = f1 + offset;
+    f2 = f2 + offset;
 end
 %%
 
