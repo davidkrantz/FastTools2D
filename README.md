@@ -2,6 +2,10 @@
 
 This library provides tools to compute sums of various potentials. For periodic potentials the spectral Ewald method is provided, while for non-periodic potentials the fast mulitpole method (FMM) is provided. 
 
+Currently includes
+* FMM for Stokes single- and double-layer potentials
+* Spectral Ewald for doubly-periodic Stokes single- and double-layer potentials
+
 ## Compilation Instructions
 
 ### FMM
@@ -58,6 +62,8 @@ In the `tests` directory, there are several tests that can be used to verify the
 ## To do
 
 * add more kernels
+* create CMake script for FMM
+* check OMP timings
 
 ## Acknowledgements
 
