@@ -37,12 +37,6 @@ ysrc = Ly*rand(Nsrc,1);
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 
-% wrap source points to reference cell, for testing this is necessary
-% because the k=0 mode in the double-layer potential depends on the source
-% locations
-xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
-ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
-
 %% Check single-layer potential
 fprintf("*********************************************************\n");
 fprintf('TESTING DIRECT SUMS FOR STOKES SINGLE-LAYER POTENTIAL\n');

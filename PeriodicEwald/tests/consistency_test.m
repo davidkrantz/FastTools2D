@@ -144,11 +144,6 @@ fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
 
 [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
-% wrap xsrc, ysrc, to reference cell. This is necessary for testing
-% purposes because the k=0 mode depends on the source locations.
-xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
-ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
-
 u1 = u1 + 1i*u2;
 
 % Subtract off zero mode
@@ -163,11 +158,6 @@ n1 = [n1; n1];
 n2 = [n2; n2];
 
 Lx = 2*Lx;
-
-% wrap xsrc, ysrc, to reference cell. This is necessary for testing
-% purposes because the k=0 mode depends on the source locations.
-xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
-ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 
 [u3, u4] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
