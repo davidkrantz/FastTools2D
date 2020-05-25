@@ -209,7 +209,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             //multiplication by -i
             Hhat1_re[ptr] = kdotq_im * e / Ksq;
-            Hhat1_im[ptr] = -kdotq_re * e /Ksq;           
+            Hhat1_im[ptr] = -kdotq_re * e / Ksq;           
             
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
@@ -310,6 +310,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     double tmp = ey*e1[y];
                     
                     pressure[k] += tmp*Ht1[idx];
+                    idx++;
                     ey *= e3y;
                 }
                 ex *= e3x;
