@@ -189,39 +189,58 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
  #pragma omp parallel for
     for(int j = 0;j<Mx;j++) {
         int ptr = j*My;
+        
         double k1;
         if(j <= Mx/2)
             k1 = 2.0*pi/Lx*j;
         else
             k1 = 2.0*pi/Lx*(j-Mx);
         for(int k = 0;k<=My/2;k++,ptr++) {
+            
+            //Hhat1 contains density component 1 convolved with Gaussians
+            //Hhat2 contains density component 2 convolved with Gaussians
+            double q1_re = Hhat1_re[ptr];
+            double q1_im = Hhat1_im[ptr];
+            double q2_re = Hhat2_re[ptr];
+            double q2_im = Hhat2_im[ptr];
+            
             double k2 = 2.0*pi/Ly*k;
             double Ksq = k1*k1+k2*k2;
             double e = (1.0/(Ksq*Ksq)+0.25/(Ksq*xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
-
-            double tmp = k2*(k2*Hhat1_re[ptr]-k1*Hhat2_re[ptr]);
-            Hhat2_re[ptr] = k1*(k1*Hhat2_re[ptr]-k2*Hhat1_re[ptr])*e;
-            Hhat1_re[ptr] = tmp*e;
-
-            tmp = k2*(k2*Hhat1_im[ptr]-k1*Hhat2_im[ptr]);
-            Hhat2_im[ptr] = k1*(k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr])*e;
-            Hhat1_im[ptr] = tmp*e;
+            
+            double kdotq_re = k1 * q1_re + k2 * q2_re;
+            double kdotq_im = k1 * q1_im + k2 * q2_im;
+            
+            Hhat1_re[ptr] = (Ksq*q1_re - k1 * kdotq_re)*e;
+            Hhat1_im[ptr] = (Ksq*q1_im - k1 * kdotq_im)*e;
+            
+            Hhat2_re[ptr] = (Ksq*q2_re - k2 * kdotq_re)*e;
+            Hhat2_im[ptr] = (Ksq*q2_im - k2 * kdotq_im)*e;
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
+            
+            //Hhat1 contains density component 1 convolved with Gaussians
+            //Hhat2 contains density component 2 convolved with Gaussians
+            double q1_re = Hhat1_re[ptr];
+            double q1_im = Hhat1_im[ptr];
+            double q2_re = Hhat2_re[ptr];
+            double q2_im = Hhat2_im[ptr];
+            
             double k2 = 2.0*pi/Ly*(k-My/2+1);
             double Ksq = k1*k1+k2*k2;
             double e = (1.0/(Ksq*Ksq)+0.25/(Ksq*xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
-
-            double tmp = k2*(k2*Hhat1_re[ptr]-k1*Hhat2_re[ptr]);
-            Hhat2_re[ptr] = k1*(k1*Hhat2_re[ptr]-k2*Hhat1_re[ptr])*e;
-            Hhat1_re[ptr] = tmp*e;
-
-            tmp = k2*(k2*Hhat1_im[ptr]-k1*Hhat2_im[ptr]);
-            Hhat2_im[ptr] = k1*(k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr])*e;
-            Hhat1_im[ptr] = tmp*e;
+            
+            double kdotq_re = k1 * q1_re + k2 * q2_re;
+            double kdotq_im = k1 * q1_im + k2 * q2_im;
+            
+            Hhat1_re[ptr] = (Ksq*q1_re - k1 * kdotq_re)*e;
+            Hhat1_im[ptr] = (Ksq*q1_im - k1 * kdotq_im)*e;
+            
+            Hhat2_re[ptr] = (Ksq*q2_re - k2 * kdotq_re)*e;
+            Hhat2_im[ptr] = (Ksq*q2_im - k2 * kdotq_im)*e;
         }
     }
- 
+    
     //Remove the zero frequency term.
     Hhat1_re[0] = 0;
     Hhat2_re[0] = 0;
