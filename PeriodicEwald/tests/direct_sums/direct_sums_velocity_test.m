@@ -14,8 +14,8 @@ tol = 1e-16;
 % k trunctation for direct summation
 kinf = 100;
 
-Nsrc = 10;
-Ntar = 10;
+Nsrc = 20;
+Ntar = 20;
 
 Lx = 1;
 Ly = 2;
