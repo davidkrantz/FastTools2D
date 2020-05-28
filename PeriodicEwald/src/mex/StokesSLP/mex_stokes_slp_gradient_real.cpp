@@ -108,8 +108,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             for(int k=sidx;k<sidx+nsources_in_box[current_box];k++) {
                 
-                double r1 = psrc_a[2*k] - ptar_a[2*j];
-                double r2 = psrc_a[2*k+1] - ptar_a[2*j+1];
+                double r1 = ptar_a[2*j] - psrc_a[2*k];
+                double r2 = ptar_a[2*j+1] - psrc_a[2*k+1] ;
                 
                 double f1 = f_a[2*k];
                 double f2 = f_a[2*k+1];
@@ -122,14 +122,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 double e2 = exp(-xi2*rSq);
                 double rdotf = f1*r1 + f2*r2;
 
-                Ts[4*j] += e2*(2*xi*xi*r1*f1 - (2*xi*xi*r1*r1*rdotf - rdotf)/rSq 
-                                - 2*r1*r1*rdotf/rSq/rSq);
-                Ts[4*j+1] += e2*(2*xi*xi*r1*f2 - (2*xi*xi*r1*r2*rdotf - r2*f1 
-                                + f2*r1)/rSq - 2*r1*r2*rdotf/rSq/rSq); 
-                Ts[4*j+2] += e2*(2*xi*xi*r2*f1 - (2*xi*xi*r1*r2*rdotf - r1*f2 
-                                + f1*r2)/rSq - 2*r1*r2*rdotf/rSq/rSq); 
-                Ts[4*j+3] += e2*(2*xi*xi*r2*f2 - (2*xi*xi*r2*r2*rdotf - rdotf)/rSq 
-                                - 2*r2*r2*rdotf/rSq/rSq);  
+                Ts[4*j] += e2*(2*xi*xi*r1*f1 + rdotf/rSq
+                                        - 2*r1*r1*rdotf*(xi*xi + 1/rSq)/rSq);
+                Ts[4*j+1] += e2*(2*xi*xi*r1*f2 + (-r1*f2 + r2*f1)/rSq
+                                        -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                Ts[4*j+2] += e2*(2*xi*xi*r2*f1 + (r1*f2 - r2*f1)/rSq
+                                        -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                Ts[4*j+3] += e2*(2*xi*xi*r2*f2 + rdotf/rSq
+                                        - 2*r2*r2*rdotf*(xi*xi + 1/rSq)/rSq);
             }
         }
         
@@ -154,8 +154,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     int idx = box_offsets_src[source_box];
                     for(int l=0;l<nsources_in_box[source_box];l++,idx++) {
                         
-                        double r1 = psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re;
-                        double r2 = psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im;
+                        double r1 = ptar_a[2*(tidx+k)] -  (psrc_a[2*idx] + zoff_re);
+                        double r2 = ptar_a[2*(tidx+k)+1] - (psrc_a[2*idx+1] + zoff_im);
                         
                         double f1 = f_a[2*idx];
                         double f2 = f_a[2*idx+1];
@@ -167,14 +167,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             double e2 = exp(-xi2*rSq);
                             double rdotf = f1*r1 + f2*r2;
                             
-                            Ts[4*(tidx+k)] += e2*(2*xi*xi*r1*f1 
-                                    - (2*xi*xi*r1*r1*rdotf - rdotf)/rSq - 2*r1*r1*rdotf/rSq/rSq);
-                            Ts[4*(tidx+k)+1] += e2*(2*xi*xi*r1*f2 
-                                    - (2*xi*xi*r1*r2*rdotf - r2*f1 + f2*r1)/rSq - 2*r1*r2*rdotf/rSq/rSq);
-                            Ts[4*(tidx+k)+2] += e2*(2*xi*xi*r2*f1 
-                                    - (2*xi*xi*r1*r2*rdotf - r1*f2 + f1*r2)/rSq - 2*r1*r2*rdotf/rSq/rSq);
-                            Ts[4*(tidx+k)+3] += e2*(2*xi*xi*r2*f2 
-                                    - (2*xi*xi*r2*r2*rdotf - rdotf)/rSq - 2*r2*r2*rdotf/rSq/rSq);
+                            Ts[4*(tidx+k)] += e2*(2*xi*xi*r1*f1 + rdotf/rSq
+                                        - 2*r1*r1*rdotf*(xi*xi + 1/rSq)/rSq);
+                            Ts[4*(tidx+k)+1] += e2*(2*xi*xi*r1*f2 + (-r1*f2 + r2*f1)/rSq
+                                        -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                            Ts[4*(tidx+k)+2] += e2*(2*xi*xi*r2*f1 + (r1*f2 - r2*f1)/rSq
+                                        -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                            Ts[4*(tidx+k)+3] += e2*(2*xi*xi*r2*f2 + rdotf/rSq
+                                        - 2*r2*r2*rdotf*(xi*xi + 1/rSq)/rSq);
                         }
                     }
                 }
