@@ -95,7 +95,7 @@ nside_y = a*B;
 rc = Lx/nside_x;
 
 xi = find_xi(Q,Lx,Ly,rc,tol);
-kinfx = 12*find_kinfb(Q,Lx,Lx,xi,tol);
+kinfx = find_kinfb(Q,Lx,Lx,xi,tol);
 
 Mx = min(2*kinfx,10000);
 
@@ -139,6 +139,8 @@ if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
+
+%u = ur_tmp(1:2,:) + uk(1:2,:);
 
 u = ur + uk;
 
