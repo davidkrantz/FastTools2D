@@ -59,7 +59,7 @@ end
 E = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E(j,j) = max(abs(u(:,i) - u(:,j)));
+        E(i,j) = max(abs(u(:,i) - u(:,j)));
     end
 end
 fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',...
