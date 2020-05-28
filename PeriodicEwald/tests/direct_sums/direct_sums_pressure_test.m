@@ -17,8 +17,8 @@ kinf = 100;
 Nsrc = 20;
 Ntar = 20;
 
-Lx = 2*pi;
-Ly = 2*pi;
+Lx = 1;
+Ly = 2;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
