@@ -34,8 +34,8 @@ for n=1:Nsrc
                 xsrc_p = xsrc(n) + jpx*Lx;
                 ysrc_p = ysrc(n) + jpy*Ly;
                 
-                r1 = (xsrc_p - xtar(m));
-                r2 = (ysrc_p - ytar(m));
+                r1 = -(xsrc_p - xtar(m));
+                r2 = -(ysrc_p - ytar(m));
                 r = sqrt(r1^2 + r2^2);
                                
                 if abs(r) < 1e-13
@@ -59,6 +59,6 @@ function pressure = stokeslet_pressure_real_sum(r1, r2, f1, f2, xi)
 rdotf = r1*f1 + r2*f2;
 r = sqrt(r1^2 + r2^2);
 
-pressure = rdotf*exp(-xi*xi*r^2) / r^2;
+pressure = -rdotf*exp(-xi*xi*r^2) / r^2;
 
 end
