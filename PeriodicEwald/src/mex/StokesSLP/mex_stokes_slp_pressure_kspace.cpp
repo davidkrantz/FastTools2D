@@ -201,15 +201,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             //Hhat1 contains density component 1 convolved with Gaussians
             //Hhat2 contains density component 2 convolved with Gaussians
-            //double kdotq_re = k1*Hhat2_re[ptr]-k2*Hhat1_re[ptr];
-            //double kdotq_im = k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr];
-            
             double kdotq_re = k1 * Hhat1_re[ptr] + k2 * Hhat2_re[ptr];
             double kdotq_im = k1 * Hhat1_im[ptr] + k2 * Hhat2_im[ptr];
             
-            //multiplication by -i
-            Hhat1_re[ptr] = kdotq_im * e / Ksq;
-            Hhat1_im[ptr] = -kdotq_re * e / Ksq;           
+            //multiplication by i
+            Hhat1_re[ptr] = -kdotq_im * e / Ksq;
+            Hhat1_im[ptr] = kdotq_re * e / Ksq;           
             
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
@@ -218,25 +215,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double e = exp(-Ksq*(1-eta)/(4*xi*xi));
             
             //Hhat1 contains density component 1 convolved with Gaussians
-            //Hhat2 contains density component 2 convolved with Gaussians
-            //double kdotq_re = k1*Hhat2_re[ptr]-k2*Hhat1_re[ptr];
-            //double kdotq_im = k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr];
-                
+            //Hhat2 contains density component 2 convolved with Gaussians                
             double kdotq_re = k1 * Hhat1_re[ptr] + k2 * Hhat2_re[ptr];
             double kdotq_im = k1 * Hhat1_im[ptr] + k2 * Hhat2_im[ptr];
             
             // multiplication by -i
-            Hhat1_re[ptr] = kdotq_im * e / Ksq;
-            Hhat1_im[ptr] = -kdotq_re * e / Ksq;
-            
-            /*
-            double tmp = k2*(k2*Hhat1_re[ptr]-k1*Hhat2_re[ptr]);
-            Hhat2_re[ptr] = k1*(k1*Hhat2_re[ptr]-k2*Hhat1_re[ptr])*e;
-            Hhat1_re[ptr] = tmp*e;
-            
-            tmp = k2*(k2*Hhat1_im[ptr]-k1*Hhat2_im[ptr]);
-            Hhat2_im[ptr] = k1*(k1*Hhat2_im[ptr]-k2*Hhat1_im[ptr])*e;
-            Hhat1_im[ptr] = tmp*e;*/
+            Hhat1_re[ptr] = -kdotq_im * e / Ksq;
+            Hhat1_im[ptr] = kdotq_re * e / Ksq;
         }
     }
     
@@ -332,7 +317,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 
                 ex *= e3x;
             }
-            
         }
         
         tmp = 4*xi*xi/eta;

@@ -118,7 +118,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 
                 //compute r dot f
                 double rdotf = x1 * fs[2*k] + x2 * fs[2*k+1];
-                pressure[j] += rdotf * exp(-xi*xi * r2)/(xi*xi * r2);
+                pressure[j] += rdotf * exp(-xi*xi * r2)/r2;
             }
         }
         
@@ -150,7 +150,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                         if(r2 < cutoffsq) {
                             
                             double rdotf = x1 * fs[2*idx] + x2 * fs[2*idx+1];                          
-                            pressure[tidx + k] += rdotf * exp(-xi*xi * r2)/(xi*xi * r2);
+                            pressure[tidx + k] += rdotf * exp(-xi*xi * r2)/r2;
                         }
                     }
                 }
@@ -167,7 +167,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* pressure_out = mxGetPr(plhs[0]);
 
     for(int j = 0;j<Ntar;j++) {
-        pressure_out[particle_offsets_tar[j]] = pressure[j] / (4*pi);
+        pressure_out[particle_offsets_tar[j]] = pressure[j] / (2*pi);
     }
     
     /*Clean up. FF*/
