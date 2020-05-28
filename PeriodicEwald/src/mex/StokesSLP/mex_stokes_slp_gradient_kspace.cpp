@@ -283,6 +283,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mxDestroyArray(fft2rhs[1]);
     
     //Do the inverse 2D FFTs. We use Matlab's inbuilt functions again.
+    //Note that we could eliminate one of these IFFTs by noting that 
+    //trace(grad u) = 0, but we'll keep it here for a consistency check
     mexCallMATLAB(1,&fft2rhs[0],1,&fft2lhs[0],"ifft2");
     mexCallMATLAB(1,&fft2rhs[1],1,&fft2lhs[1],"ifft2");
     mexCallMATLAB(1,&fft2rhs[2],1,&fft2lhs[2],"ifft2");
