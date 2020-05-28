@@ -99,9 +99,6 @@ Mx = min(2*kinfx,10000);
 My = B * Mx;
 Mx = A * Mx;
 
-Mx = Mx;
-My = My;
-
 w = P*Lx/Mx/2;
 eta = (2*xi*w/m)^2;
 
@@ -132,7 +129,7 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
-p = pr + pk;
+p = -2*(pr + pk);
 
 end
 
