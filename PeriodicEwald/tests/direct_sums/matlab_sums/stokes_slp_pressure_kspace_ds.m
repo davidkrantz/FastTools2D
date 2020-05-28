@@ -47,7 +47,7 @@ for n = 1:Nsrc
                 end
                 
                 tmp = stokeslet_pressure_k_sum(k1, k2, f1(n), f2(n), xi);
-                pk_tmp(m) = pk_tmp(m) + tmp*exp(-1i*(k1*r1+k2*r2));
+                pk_tmp(m) = pk_tmp(m) + tmp*exp(1i*(k1*r1+k2*r2));
  
             end
         end
@@ -66,7 +66,7 @@ function pk = stokeslet_pressure_k_sum(k1, k2, f1, f2, xi)
     kdotf = k1*f1 + k2*f2;
     k = sqrt(k1^2 + k2^2);
     
-    pk = -1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
+    pk = 1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
 end
 
 

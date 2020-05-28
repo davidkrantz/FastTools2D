@@ -33,11 +33,11 @@ for n=1:Nsrc
             for jpy = -1:1 %Go through a layer of boxes in the y direction
                 
                 %Compute periodic source point
-                xsrc_p = xsrc(n) + jpx*Lx;
-                ysrc_p = ysrc(n) + jpy*Ly;
+                xsrc_p = xsrc(n) - jpx*Lx;
+                ysrc_p = ysrc(n) - jpy*Ly;
                 
-                r1 = (xsrc_p - xtar(m));
-                r2 = (ysrc_p - ytar(m));
+                r1 = xtar(m) - xsrc_p;
+                r2 = ytar(m) - ysrc_p;
                 r = sqrt(r1^2 + r2^2);
                                
                 if abs(r) < 1e-13
@@ -66,10 +66,10 @@ bdotf = f1*b1 + f2*b2;
 
 r = sqrt(r1^2 + r2^2);
 
-ugrad_real(1) = exp(-xi*xi*r^2)*(2*xi*xi*rdotb*f1 - 2*xi*xi*rdotb*rdotf*r1/r^2 ...
-        + (rdotf + bdotf*r1 - f1*rdotb)/r^2 - 2*r1*rdotb*rdotf/r^4);
+ugrad_real(1) = exp(-xi*xi*r^2)*(2*xi*xi*rdotb*f1 + ...
+        (b1*rdotf + r1*bdotf - f1*rdotb )/r^2 - 2*r1*rdotb*rdotf*(xi*xi + 1/r^2)/r^2);
 
-ugrad_real(2) = exp(-xi*xi*r^2)*(2*xi*xi*rdotb*f2 - 2*xi*xi*rdotb*rdotf*r2/r^2 ...
-        + (rdotf + bdotf*r2 - f2*rdotb)/r^2 - 2*r2*rdotb*rdotf/r^4);    
+ugrad_real(2) = exp(-xi*xi*r^2)*(2*xi*xi*rdotb*f2 + ...
+        ( b2*rdotf + r2*bdotf - f2*rdotb)/r^2 - 2*r2*rdotb*rdotf*(xi*xi + 1/r^2)/r^2);    
 
 end

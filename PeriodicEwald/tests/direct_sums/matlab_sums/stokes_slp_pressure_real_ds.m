@@ -50,7 +50,7 @@ for n=1:Nsrc
     end
 end
 
-preal = preal / (4*pi);
+preal = preal / (2*pi);
 
 end
 
@@ -59,6 +59,6 @@ function pressure = stokeslet_pressure_real_sum(r1, r2, f1, f2, xi)
 rdotf = r1*f1 + r2*f2;
 r = sqrt(r1^2 + r2^2);
 
-pressure = rdotf*exp(-xi*xi*r^2) / (xi*xi* r^2);
+pressure = rdotf*exp(-xi*xi*r^2) / r^2;
 
 end
