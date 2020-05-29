@@ -11,23 +11,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgTxt("psrc must be a 2xn matrix.");
     if(mxGetM(prhs[1]) != 2)
         mexErrMsgTxt("ptar must be a 2xn matrix.");
-    if(mxGetM(prhs[4]) != 2)
+    if(mxGetM(prhs[2]) != 2)
         mexErrMsgTxt("f must be a 2xn matrix.");
-    if(mxGetN(prhs[4]) != mxGetN(prhs[0]))
+    if(mxGetN(prhs[2]) != mxGetN(prhs[0]))
         mexErrMsgTxt("psrc and f must be the same size.");
     
-    //The points.
+    //Source and target points.
     double* psrc = mxGetPr(prhs[0]);
     int Nsrc = mxGetN(prhs[0]);
     double* ptar = mxGetPr(prhs[1]);
     int Ntar = mxGetN(prhs[1]);
     
-    //The Ewald parameter xi
-    double xi = mxGetScalar(prhs[2]);
-    //The splitting parameter eta
-    double eta = mxGetScalar(prhs[3]);
-    //The Stokeslet vectors.
-    double* f = mxGetPr(prhs[4]);
+    //Source strengths
+    double* f = mxGetPr(prhs[2]);
+    
+    //Ewald parameter xi
+    double xi = mxGetScalar(prhs[3]);
+    
+    //Splitting parameter eta
+    double eta = mxGetScalar(prhs[4]);    
     
     //Number of grid intervals in each direction
     int Mx = static_cast<int>(mxGetScalar(prhs[5]));
@@ -36,12 +38,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //The length of the domain
     double Lx = mxGetScalar(prhs[7]);
     double Ly = mxGetScalar(prhs[8]);
-    //The width of the Gaussian bell curves. (unnecessary?)
+    
+    //Width of the Gaussian bell curves
     double w = mxGetScalar(prhs[9]);
-    //The width of the Gaussian bell curves on the grid.
+    
+    //Number of support points for Gaussians
     int P = static_cast<int>(mxGetScalar(prhs[10]));
     
-    //The grid spacing
+    //Grid spacing, here we assume hx = hy = h
     double h = Lx/Mx;
     
     //---------------------------------------------------------------------
@@ -55,9 +59,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //The function H on the grid. We need to have these as Matlab arrays
     //since we call Matlab's in-built fft2 to compute the 2D FFT.
     mxArray *fft2rhs[2],*fft2lhs[2];
-    fft2rhs[0] = mxCreateDoubleMatrix(My, Mx, mxREAL);
-    double* H1 = mxGetPr(fft2rhs[0]);
+    fft2rhs[0] = mxCreateDoubleMatrix(My, Mx, mxREAL);    
     fft2rhs[1] = mxCreateDoubleMatrix(My, Mx, mxREAL);
+    
+    double* H1 = mxGetPr(fft2rhs[0]);
     double* H2 = mxGetPr(fft2rhs[1]);
     
     //This is the precomputable part of the fast Gaussian gridding.
@@ -98,12 +103,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double e3x = exp(-2*tmp*h*px);
         double e3y = exp(-2*tmp*h*py);
         
-        //      mexPrintf("k = %d, ex = %3.3g, e4y = %3.3g, e3x = %3.3g, e3y = %3.3g\n", k, ex, e4y, e3x, e3y);
         //We add the Gaussians column by column, and lock the one we are
         //working on to avoid race conditions.
         for(int x = 0;x<P+1;x++) {
             double ey = ex*e4y*e1[x];
             int xidx = ((x+mx+Mx)%Mx)*My;
+            
             omp_set_lock(&locks[(x+mx+Mx)%Mx]);
             if(my >= 0 && my < My-P-1) {
                 int idx = my+xidx;
@@ -114,7 +119,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     H2[idx] += tmp*f[2*k+1];
                     ey *= e3y;
                 }
-            }else{
+            }
+            else{
                 for(int y = 0;y<P+1;y++) {
                     double tmp = ey*e1[y];
                     int idx = ((y+my+My)%My)+xidx;
@@ -133,8 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //get rid of them.
     for(int j = 0;j<Mx;j++)
         omp_destroy_lock(&locks[j]);
-    delete locks;
     
+    delete locks;
     
     //---------------------------------------------------------------------
     //Step 2 : Frequency space filter
@@ -161,25 +167,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //We cannot assume that both the real and imaginary part of the
     //Fourier transforms are non-zero.
     if(Hhat1_im == NULL) {
-        
-//        Hhat1_im = new double[M*M];
-//        memset(Hhat1_im,0,M*M*sizeof(double));
-        
-        Hhat1_im = (double*) mxCalloc(cs,sizeof(double));
-        
+        Hhat1_im = (double*) mxCalloc(cs,sizeof(double));        
         mxSetPi(fft2lhs[0],Hhat1_im);
     }
-    if(Hhat2_im == NULL) {
-        
-//        Hhat2_im = new double[M*M];
-//        memset(Hhat2_im,0,M*M*sizeof(double));
-        
-        Hhat2_im = (double*) mxCalloc(cs,sizeof(double));
-        
+    if(Hhat2_im == NULL) {        
+        Hhat2_im = (double*) mxCalloc(cs,sizeof(double));        
         mxSetPi(fft2lhs[1],Hhat2_im);
     }
-    
-    
+       
     //Apply filter in the frequency domain. This is a completely
     //parallel operation. The FFT gives the frequency components in
     //non-sequential order, so we have to split the loops. One could
@@ -206,8 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             //multiplication by i
             Hhat1_re[ptr] = -kdotq_im * e / Ksq;
-            Hhat1_im[ptr] = kdotq_re * e / Ksq;           
-            
+            Hhat1_im[ptr] = kdotq_re * e / Ksq;            
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
             double k2 = 2.0*pi/Ly*(k-My/2+1);
@@ -227,9 +221,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     //Remove the zero frequency term.
     Hhat1_re[0] = 0;
-    Hhat2_re[0] = 0;
     Hhat1_im[0] = 0;
-    Hhat2_im[0] = 0;
     
     //Get rid of the old H1 and H2 arrays. They are no longer needed.
     mxDestroyArray(fft2rhs[0]);
@@ -292,18 +284,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 double ey = ex*e4y*e1[x];
                 
                 for(int y = 0;y<P+1;y++) {
-                    double tmp = ey*e1[y];
-                    
+                    double tmp = ey*e1[y];                    
                     pressure[k] += tmp*Ht1[idx];
                     idx++;
                     ey *= e3y;
                 }
                 ex *= e3x;
                 idx += My-P-1;
-            }
-            
-        }else{
-            
+            }            
+        }
+        else{            
             for(int x = 0;x<P+1;x++) {
                 double ey = ex*e4y*e1[x];
                 int xidx = ((x+mx+Mx)%Mx)*My;
@@ -311,10 +301,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     double tmp = ey*e1[y];
                     int idx = ((y+my+My)%My)+xidx;
                     pressure[k] += tmp*Ht1[idx];
-                    ey *= e3y;
-                    
-                }
-                
+                    ey *= e3y;                    
+                }                
                 ex *= e3x;
             }
         }
