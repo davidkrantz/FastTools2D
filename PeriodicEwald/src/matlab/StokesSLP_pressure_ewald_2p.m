@@ -122,14 +122,14 @@ if verbose
     tic
 end
 
-pk = mex_stokes_slp_pressure_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
+pk = mex_stokes_slp_pressure_kspace(psrc,ptar,f,xi,eta,Mx,My,Lx,Ly,w,P);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-p = -2*(pr + pk);
+p = -(pr + pk);
 
 end
 
