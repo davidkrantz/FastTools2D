@@ -47,13 +47,13 @@
         0.0865197248079397976498L,1L,
     };
 
-
+/*
 void Assign(double *psrc, double *ptar, double len_x, double len_y, int nsrc, 
         int ntar, int nside_x, int nside_y,
         int* particle_offsets_src,int* box_offsets_src,int* nsources_in_box,
         int* particle_offsets_tar,int* box_offsets_tar,int* ntargets_in_box);
 
-inline double expint(double x);
+inline double expint(double x);*/
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 

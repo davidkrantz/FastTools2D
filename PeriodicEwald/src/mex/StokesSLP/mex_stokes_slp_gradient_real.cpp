@@ -6,12 +6,6 @@
 #include "mm_mxmalloc.h"
 #include "ewald_tools.h"
 
-#define pi 3.1415926535897932385
-
-#define _mm_shuf2_pd(__A) (static_cast<__m128d>(__builtin_ia32_shufpd (static_cast<__v2df>(__A), static_cast<__v2df>(__A), 1)))
-
-inline double expint(double x);
-
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /*List used for translating sources. FF */
     static const int ilist_x[8] = {-1,-1,-1,0,0,1,1,1};
@@ -122,12 +116,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 double e2 = exp(-xi2*rSq);
                 double rdotf = f1*r1 + f2*r2;
 
+                //j = 1, p = 1
                 Ts[4*j] += e2*(2*xi*xi*r1*f1 + rdotf/rSq
                                         - 2*r1*r1*rdotf*(xi*xi + 1/rSq)/rSq);
+                
+                //j = 2, p = 1
                 Ts[4*j+1] += e2*(2*xi*xi*r1*f2 + (-r1*f2 + r2*f1)/rSq
                                         -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                
+                //j = 1, p = 2
                 Ts[4*j+2] += e2*(2*xi*xi*r2*f1 + (r1*f2 - r2*f1)/rSq
                                         -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                
+                //j = 2, p = 2
                 Ts[4*j+3] += e2*(2*xi*xi*r2*f2 + rdotf/rSq
                                         - 2*r2*r2*rdotf*(xi*xi + 1/rSq)/rSq);
             }
@@ -167,12 +168,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             double e2 = exp(-xi2*rSq);
                             double rdotf = f1*r1 + f2*r2;
                             
+                            //j = 1, p = 1
                             Ts[4*(tidx+k)] += e2*(2*xi*xi*r1*f1 + rdotf/rSq
                                         - 2*r1*r1*rdotf*(xi*xi + 1/rSq)/rSq);
+                            
+                            //j = 1, p = 2
                             Ts[4*(tidx+k)+1] += e2*(2*xi*xi*r1*f2 + (-r1*f2 + r2*f1)/rSq
                                         -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                            
+                            //j = 2, p = 1
                             Ts[4*(tidx+k)+2] += e2*(2*xi*xi*r2*f1 + (r1*f2 - r2*f1)/rSq
                                         -2*r1*r2*rdotf*(xi*xi + 1/rSq)/rSq);
+                            
+                            //j = 2, p = 2
                             Ts[4*(tidx+k)+3] += e2*(2*xi*xi*r2*f2 + rdotf/rSq
                                         - 2*r2*r2*rdotf*(xi*xi + 1/rSq)/rSq);
                         }

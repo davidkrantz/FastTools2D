@@ -6,14 +6,8 @@
 #include "mm_mxmalloc.h"
 #include "ewald_tools.h"
 
-#define pi 3.1415926535897932385
-
 /*Comments by Fredrik Fryklund denoted by FF*/
 /*Comments by Sara Pålsson denoted by SP*/
-
-
-#define _mm_shuf2_pd(__A) (static_cast<__m128d>(__builtin_ia32_shufpd (static_cast<__v2df>(__A), static_cast<__v2df>(__A), 1)))
-
 
 void Assign(double *psrc, double *ptar, double len_x, double len_y, int nsrc,
         int ntar, int nside_x, int nside_y,
@@ -49,7 +43,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     /*#Boxes contained in L^2, given by nside_x*nside_y. FF*/
     int num_boxes = nside_x*nside_y;
     
-    /*offsets refer to values that are added to a base pointer in order to access a single element in a sequential list of elements. FF */
+    /*offsets refer to values that are added to a base pointer in order to 
+     * access a single element in a sequential list of elements. FF */
     /* For source particles: */
     int* particle_offsets_src = new int[Nsrc];
     int* box_offsets_src = new int[num_boxes+1];
@@ -71,7 +66,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* fs = static_cast<double*>(_mm_mxMalloc (2*Nsrc*sizeof(double), 16));
     double* pressure = static_cast<double*>(_mm_mxCalloc (Ntar,sizeof(double),16));
     
-    /*Write from psrc/ptar to psrc_a/ptar_a, f to fs and u to us, which are compatible with SSE commands. FF + SP */
+    /*Write from psrc/ptar to psrc_a/ptar_a, f to fs and u to us, 
+     * which are compatible with SSE commands. FF + SP */
     for(int j = 0;j<Nsrc;j++) {
         psrc_a[2*j] = psrc[2*particle_offsets_src[j]];
         psrc_a[2*j+1] = psrc[2*particle_offsets_src[j]+1];
@@ -85,18 +81,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         ptar_a[2*j] = ptar[2*particle_offsets_tar[j]];
         ptar_a[2*j+1] = ptar[2*particle_offsets_tar[j]+1];
     }
-    
-    double self = -1.288607832450766155 - log(xi);
-    
-    /*Cut off radius squared. nside such that all points in a box are within the distance sqrt(cutoffsq) of each other. FF*/
+        
+    /*Cut off radius squared. nside such that all points in a box are 
+     * within the distance sqrt(cutoffsq) of each other. FF*/
     double cutoffsq = len_x*len_y/nside_x/nside_y;
-    // mexPrintf("xi : %f, rc : %e, numboxes = %d\n", xi, sqrt(cutoffsq), num_boxes);
-//     mexPrintf("R1 : %f, R2 : %f\n",cutoffsq,36.0/xi/xi);
     
 #pragma omp parallel for
     for(int current_box = 0;current_box<num_boxes;current_box++) {
         
-        //mexPrintf("Box: %d, sources :%d, targets: %d\n", current_box, nsources_in_box[current_box], ntargets_in_box[current_box]);
+
         if(ntargets_in_box[current_box] == 0)
             continue;
         
@@ -122,7 +115,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             }
         }
         
-        /*Compute interactions from the nearest neighbors. On a uniform periodic grid, each box has eight neighbors. FF*/
+        /*Compute interactions from the nearest neighbors. 
+         * On a uniform periodic grid, each box has eight neighbors. FF*/
         for(int j=0;j<8;j++) {
             
             int per_source_x = current_box%nside_x+ilist_x[j];

@@ -1,4 +1,3 @@
-#include "mex.h"
 #include <math.h>
 #include <omp.h>
 #include <string.h>
@@ -67,78 +66,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     //This is the precomputable part of the fast Gaussian gridding.
     double* e1 = new double[P+1];
-    double tmp = -2*xi*xi/eta*h*h;
-    for(int j = -P/2;j<=P/2;j++)
-        e1[j+P/2] = exp(tmp*j*j);
-    
-    //Spreading the sources to the grid is not a completely parallel
-    //operation. We use the simple approach of locking the column of the
-    //matrix we are working on currently. This might not be optimal but it
-    //is simple to implement.
-    omp_lock_t* locks = new omp_lock_t[Mx];
-    
-    for(int j = 0;j<Mx;j++)
-        omp_init_lock(&locks[j]);
-    
-    //We use OpenMP for simple parallelization.
-#pragma omp parallel for
-    for(int k = 0;k<Nsrc;k++) {
-        
-        //The Gaussian bells are translation invariant. We exploit this
-        //fact to avoid blow-up of the terms and the numerical instability
-        //that follows. (px,py) is the center of the bell with the original
-        //grid-alignment but close to the origin.
-        
-        double xsrc = psrc[2*k];
-        double ysrc = psrc[2*k+1];
-        
-        int mx, my;
-        double px, py;
-        
-        FindClosestNode(xsrc, ysrc, Lx, Ly, h, P, &mx, &my, &px, &py);
-        
-        //Some auxillary quantities for the fast Gaussian gridding.
-        double tmp = -2*xi*xi/eta;
-        double ex = exp(tmp*(px*px+py*py + 2*w*px));
-        double e4y = exp(2*tmp*w*py);
-        double e3x = exp(-2*tmp*h*px);
-        double e3y = exp(-2*tmp*h*py);
-        
-        //We add the Gaussians column by column, and lock the one we are
-        //working on to avoid race conditions.
-        for(int x = 0;x<P+1;x++) {
-            double ey = ex*e4y*e1[x];
-            int xidx = ((x+mx+Mx)%Mx)*My;
-            omp_set_lock(&locks[(x+mx+Mx)%Mx]);
-            if(my >= 0 && my < My-P-1) {
-                int idx = my+xidx;
-                for(int y = 0;y<P+1;y++,idx++) {
-                    double tmp = ey*e1[y];
-                    
-                    H1[idx] += tmp*f[2*k];
-                    H2[idx] += tmp*f[2*k+1];
-                    ey *= e3y;
-                }
-            }else{
-                for(int y = 0;y<P+1;y++) {
-                    double tmp = ey*e1[y];
-                    int idx = ((y+my+My)%My)+xidx;
-                    
-                    H1[idx] += tmp*f[2*k];
-                    H2[idx] += tmp*f[2*k+1];
-                    ey *= e3y;
-                }
-            }
-            omp_unset_lock(&locks[(x+mx+Mx)%Mx]);
-            ex *= e3x;
-        }
-    }
-    
-    //Spreading is the only part of the k-space sum that needs locks, so
-    //get rid of them.
-    for(int j = 0;j<Mx;j++)
-        omp_destroy_lock(&locks[j]);
-    delete locks;
+    Spread(H1, H2, e1, psrc, f, Nsrc, Lx, Ly, xi, w, eta, P, Mx, My, h);
     
     //---------------------------------------------------------------------
     //Step 2 : Frequency space filter
@@ -164,13 +92,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     //We cannot assume that both the real and imaginary part of the
     //Fourier transforms are non-zero.
-    if(Hhat1_im == NULL) {
-        
+    if(Hhat1_im == NULL) {        
         Hhat1_im = (double*) mxCalloc(cs,sizeof(double));        
         mxSetPi(fft2lhs[0],Hhat1_im);
     }
-    if(Hhat2_im == NULL) {
-        
+    if(Hhat2_im == NULL) {        
         Hhat2_im = (double*) mxCalloc(cs,sizeof(double));        
         mxSetPi(fft2lhs[1],Hhat2_im);
     }
@@ -275,74 +201,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     plhs[0] = mxCreateDoubleMatrix(2, Ntar, mxREAL);
     double* uk = mxGetPr(plhs[0]);
     
-#pragma omp parallel for
-    for(int k = 0;k<Ntar;k++) {
-        
-        //The Gaussian bells are translation invariant. We exploit this
-        //fact to avoid blow-up of the terms and the numerical instability
-        //that follows. (px,py) is the center of the bell with the original
-        //grid-alignment but close to the origin.
-        
-        double xtar = ptar[2*k];
-        double ytar = ptar[2*k+1];
-        
-        int mx, my;
-        double px, py;
-        
-        FindClosestNode(xtar, ytar, Lx, Ly, h, P, &mx, &my, &px, &py);
-        
-        double tmp = -2*xi*xi/eta;
-        double ex = exp(tmp*(px*px+py*py + 2*w*px));
-        double e4y = exp(2*tmp*w*py);
-        double e3x = exp(-2*tmp*h*px);
-        double e3y = exp(-2*tmp*h*py);
-        
-        //If there is no wrap-around due to periodicity for this gaussian,
-        //we use a faster loop. We go column by column, but as the
-        //matrices Ht1 and Ht2 are only read from we have no need for
-        //locks and such.
-        if(mx >= 0 && my >= 0 && mx < Mx-P-1 && my < My-P-1) {
-            int idx = mx*My+my;
-            for(int x = 0;x<P+1;x++) {
-                double ey = ex*e4y*e1[x];
-                
-                for(int y = 0;y<P+1;y++) {
-                    double tmp = ey*e1[y];
-                    
-                    uk[2*k] += tmp*Ht1[idx];
-                    uk[2*k+1] += tmp*Ht2[idx];
-                    
-                    idx++;
-                    ey *= e3y;
-                }
-                
-                ex *= e3x;
-                idx += My-P-1;
-            }
-            
-        }else{
-            
-            for(int x = 0;x<P+1;x++) {
-                double ey = ex*e4y*e1[x];
-                int xidx = ((x+mx+Mx)%Mx)*My;
-                for(int y = 0;y<P+1;y++) {
-                    double tmp = ey*e1[y];
-                    int idx = ((y+my+My)%My)+xidx;
-                    
-                    uk[2*k] += tmp*Ht1[idx];
-                    uk[2*k+1] += tmp*Ht2[idx];
-                    ey *= e3y;
-                }
-                
-                ex *= e3x;
-            }
-        }
-        
-        tmp = 4*xi*xi/eta;
-        tmp = tmp*tmp*h*h/pi;
-        uk[2*k] *= tmp / (4*pi);
-        uk[2*k+1] *= tmp / (4*pi);
-    }
+    Gather(Ht1, 2, 1, e1, ptar, uk, Ntar, Lx, Ly, xi, w, eta, P, Mx,My, h);
+    Gather(Ht2, 2, 2, e1, ptar, uk, Ntar, Lx, Ly, xi, w, eta, P, Mx,My, h); 
     
     //Clean up
     mxDestroyArray(fft2rhs[0]);
