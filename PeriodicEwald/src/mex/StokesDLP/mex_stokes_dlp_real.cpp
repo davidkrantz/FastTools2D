@@ -114,8 +114,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             for(int k=sidx;k<sidx+nsources_in_box[current_box];k++) {
                                 
-                double x1 = psrc_a[2*k] - ptar_a[2*j];
-                double x2 = psrc_a[2*k+1] - ptar_a[2*j+1];
+                double x1 = -(psrc_a[2*k] - ptar_a[2*j]);
+                double x2 = -(psrc_a[2*k+1] - ptar_a[2*j+1]);
                 
                 double r2 = x1*x1+x2*x2;
                 
@@ -159,8 +159,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     
                     int idx = box_offsets_src[source_box];
                     for(int l=0;l<nsources_in_box[source_box];l++,idx++) {
-                        double x1 = psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re;
-                        double x2 = psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im;
+                        double x1 = -(psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re);
+                        double x2 = -(psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im);
                         
                         double r2 = x1*x1+x2*x2;
                         
