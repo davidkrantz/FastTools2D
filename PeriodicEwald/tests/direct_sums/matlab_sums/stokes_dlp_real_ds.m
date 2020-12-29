@@ -37,8 +37,8 @@ for n=1:Nsrc
                 xsrc_p = xsrc(n) + jpx*Lx;
                 ysrc_p = ysrc(n) + jpy*Ly;
                 
-                r1 = (xsrc_p - xtar(m));
-                r2 = (ysrc_p - ytar(m));
+                r1 = -(xsrc_p - xtar(m));
+                r2 = -(ysrc_p - ytar(m));
                 r = sqrt(r1^2 + r2^2);
                                
                 % if r == 0, skip

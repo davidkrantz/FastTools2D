@@ -29,17 +29,19 @@ f1 = 10*rand(Nsrc,1);
 f2 = 10*rand(Nsrc,1);
 
 % Two components of direction vector
-%b1 = rand(Ntar,1);
-%b2 = rand(Ntar,1);
-b1 = ones(Ntar,1);
-b2 = zeros(Ntar,1);
+b1 = rand(Ntar,1);
+b2 = rand(Ntar,1);
+% b1 = ones(Ntar,1);
+% b2 = zeros(Ntar,1);
 
 % Source and target loccations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
+xtar = xsrc;
+ytar = ysrc;
 
-xtar = Lx*rand(Ntar,1);
-ytar = Ly*rand(Ntar,1);
+% xtar = Lx*rand(Ntar,1);
+% ytar = Ly*rand(Ntar,1);
 
 %% Compute solution with Spectral Ewald
 % Here we change Nb, the number of points in each box in the real space
@@ -67,7 +69,7 @@ end
 E = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E(i,j) = max(abs(u(:,i) - u(:,j)));
+        E(i,j) = max(abs(u(:,i) - u(:,j))./abs(u(:,i)));
     end
 end
 
@@ -92,93 +94,85 @@ Lx = 2*Lx;
 u2 = u3 + 1i*u4;
 
 fprintf('\nMaximum error from creating periodic replicate for SLP: %.5e\n',...
-    max(abs(u1 - u2)));
+    max(abs(u1 - u2)./abs(u1)));
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Double-layer potential 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% fprintf("\n*********************************************************\n");
-% fprintf('Checking consistency of double-layer potential...\n');
-% fprintf("*********************************************************\n\n");
-% 
-% %% Set up data
-% Nsrc = 10000;
-% Ntar = 10000;
-% 
-% Lx = 1;
-% Ly = 2;
-% 
-% % Two components of the density function
-% f1 = 10*rand(Nsrc,1);
-% f2 = 10*rand(Nsrc,1);
-% 
-% % Normal vector at source points
-% n1 = rand(Nsrc,1);
-% n2 = sqrt(1 - n1.^2);
-% 
-% % Source and target loccations
-% xsrc = Lx*rand(Nsrc,1);
-% ysrc = Ly*rand(Nsrc,1);
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Double-layer potential 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf("\n*********************************************************\n");
+fprintf('Checking consistency of double-layer potential...\n');
+fprintf("*********************************************************\n\n");
+
+%% Set up data
+Nsrc = 10000;
+Ntar = 10000;
+
+Lx = 1;
+Ly = 2;
+
+% Two components of the density function
+f1 = 10*rand(Nsrc,1);
+f2 = 10*rand(Nsrc,1);
+
+% Normal vector at source points
+n1 = rand(Nsrc,1);
+n2 = sqrt(1 - n1.^2);
+
+% Source and target loccations
+xsrc = Lx*rand(Nsrc,1);
+ysrc = Ly*rand(Nsrc,1);
+
+xtar = xsrc;
+ytar = ysrc;
+
 % xtar = Lx*rand(Ntar,1);
 % ytar = Ly*rand(Ntar,1);
-% 
-% %% Compute solution with Spectral Ewald, try with a number of bins
-% 
-% Nb = [3, 9, 27];
-% 
-% u = zeros(Ntar, length(Nb));
-% 
-% for i = 1:length(Nb)
-%     tic
-%     [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2,...
-%                 Lx, Ly,'Nb', Nb(i), 'verbose', 1);
-%     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(i), toc);
-%     
-%     u(:,i) = u1 + 1i*u2;
-% end
-% 
-% %% Check that using a different number of bins doesn't affect solution
-% E = zeros(length(Nb), length(Nb));
-% for i = 1:length(Nb)
-%     for j = 1:length(Nb)
-%         E(i,j) = max(abs(u(:,i) - u(:,j)));
-%     end
-% end
-% 
-% fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
-%     max(max(E)));
-% 
-% %% Check that replicating boxes doesn't affect solution.
-% % Note that for the Stresslet we have to subtract off the 0 mode, because
-% % it depends on the source locations
-% 
-% [u1, u2] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
-% 
-% u1 = u1 + 1i*u2;
-% 
-% % Subtract off zero mode
-% u1 = u1 - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-% u1 = u1 - 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-% 
-% xsrc = [xsrc; xsrc + Lx];
-% ysrc = [ysrc; ysrc];
-% f1 = [f1; f1];
-% f2 = [f2; f2];
-% n1 = [n1; n1];
-% n2 = [n2; n2];
-% 
-% Lx = 2*Lx;
-% 
-% [u3, u4] = StokesDLP_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
-% 
-% u2 = u3 + 1i*u4;
-% 
-% % Subtract off zero mode
-% u2 = u2 - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-% u2 = u2 - 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-% 
-% fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
-%     max(abs(u1 - u2)));
+
+%% Compute solution with Spectral Ewald, try with a number of bins
+
+Nb = [3, 9, 27];
+
+u = zeros(Ntar, length(Nb));
+
+for i = 1:length(Nb)
+    tic
+    [u1, u2] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2,...
+                b1, b2, Lx, Ly,'Nb', Nb(i), 'verbose', 1);
+    fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(i), toc);
+    
+    u(:,i) = u1 + 1i*u2;
+end
+
+%% Check that using a different number of bins doesn't affect solution
+E = zeros(length(Nb), length(Nb));
+for i = 1:length(Nb)
+    for j = 1:length(Nb)
+        E(i,j) = max(abs(u(:,i) - u(:,j))./abs(u(:,i)));
+    end
+end
+
+fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
+    max(max(E)));
+
+%% Check that replicating boxes doesn't affect solution.
+[u1, u2] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
+
+u1 = u1 + 1i*u2;
+
+xsrc = [xsrc; xsrc + Lx];
+ysrc = [ysrc; ysrc];
+f1 = [f1; f1];
+f2 = [f2; f2];
+n1 = [n1; n1];
+n2 = [n2; n2];
+
+Lx = 2*Lx;
+
+[u3, u4] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
+
+u2 = u3 + 1i*u4;
+
+fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
+    max(abs(u1 - u2)./abs(u1)));
 
 

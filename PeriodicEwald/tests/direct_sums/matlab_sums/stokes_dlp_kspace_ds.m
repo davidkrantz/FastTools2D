@@ -50,8 +50,8 @@ for n = 1:Nsrc
                 end
                 
                 [tmp_x, tmp_y] = stokes_dlp_k_sum(k1, k2, n1(n), n2(n), f1(n), f2(n), xi);
-                uk1_tmp(m) = uk1_tmp(m) + tmp_x*exp(-1i*(k1*r1+k2*r2));
-                uk2_tmp(m) = uk2_tmp(m) + tmp_y*exp(-1i*(k1*r1+k2*r2));
+                uk1_tmp(m) = uk1_tmp(m) + tmp_x*exp(1i*(k1*r1+k2*r2));
+                uk2_tmp(m) = uk2_tmp(m) + tmp_y*exp(1i*(k1*r1+k2*r2));
                 
             end
         end
@@ -65,8 +65,8 @@ end
 uk = real([uk1; uk2]) / (Lx*Ly);
 
 % Add on zero mode
-uk(1,:) = uk(1,:) - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-uk(2,:) = uk(2,:) - sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 end
 
