@@ -10,8 +10,8 @@ function [u1, u2, ur, uk, xi] = StokesSLP_gradient_ewald_2p(xsrc, ysrc,...
 %       ytar, y component of target points 
 %       f1, x component of density function
 %       f2, y component of density function
-%       f1, x component of target direction vector
-%       f2, y component of target_direction vector
+%       b1, x component of target direction vector
+%       b2, y component of target_direction vector
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
 %         'P', integer giving support points in each direction (default 24)
@@ -62,6 +62,16 @@ if nargin > 8
 end
 
 % TO DO: ADD CHECKS ON INPUT DATA HERE
+%% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
+% to work. 
+
+% Check to see first if it's necessary, for Matlab 2017a at least it isn't.
+v=ver('MATLAB');
+if v.Release~="(R2017a)"
+    offset = 1e-60;
+    f1 = f1 + offset;
+    f2 = f2 + offset;
+end
 
 if verbose
     fprintf("*********************************************************\n");
@@ -139,8 +149,6 @@ if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
-
-%u = ur_tmp(1:2,:) + uk(1:2,:);
 
 u = ur + uk;
 
