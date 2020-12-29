@@ -147,15 +147,15 @@ end
 uk = mex_stokes_dlp_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
 
 % Add on zero mode
-uk(1,:) = uk(1,:) - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-uk(2,:) = uk(2,:) - sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-u = -(ur + uk); % negative sign to match convention
+u = ur + uk; % negative sign to match convention
 
 u1 = u(1,:)';
 u2 = u(2,:)';
