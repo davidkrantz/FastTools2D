@@ -158,7 +158,7 @@ for(int current_box = 0;current_box<num_boxes;current_box++) {
             /*Store (x1-x2)^2 + (y1-y2)^2 as r2. FF*/
             _mm_storeh_pd(&r2,_mm_hadd_pd(tt,tt));
             
-            if(r2 == 0) {                
+            if(fabs(r2) < 1e-15) {   
                 us[2*j] += self*fs[2*k];
                 us[2*j+1] += self*fs[2*k+1];
             }else{
