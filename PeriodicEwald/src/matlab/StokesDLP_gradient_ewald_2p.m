@@ -66,10 +66,10 @@ end
 zsrc = xsrc + 1i*ysrc;
 ztar = xtar + 1i*ytar;
 
-srcEqualsTar = 0;
-if (length(zsrc) == length(ztar) && norm(xsrc - xtar) < 1e-16)
-    srcEqualsTar = 1;
-end
+% Flag target indices that are source points
+I = ismember(zsrc, ztar);
+c = 1:length(zsrc);
+equal_idx = c(I);
 
 %% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
 % to work. 
@@ -171,18 +171,18 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
-uself = 0;
-if srcEqualsTar
-   qsrc_c = f1 + 1i*f2;
-   nsrc_c = n1 + 1i*n2;
+u = ur + uk;
+if ~isempty(equal_idx) > 0
+   qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
+   nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
    btar_c = b1 + 1i*b2;
    
    uself = xi^2*(qsrc_c.*real(btar_c.*conj(nsrc_c)) + ...
                 nsrc_c.*real(qsrc_c.*conj(btar_c)) +...
                 btar_c.*real(qsrc_c.*conj(nsrc_c)))/(2*pi);
+            
+   u = u + [real(uself)'; imag(uself)'];
 end
-
-u = ur + uk + [real(uself)'; imag(uself)'];
 
 u1 = u(1,:)';
 u2 = u(2,:)';

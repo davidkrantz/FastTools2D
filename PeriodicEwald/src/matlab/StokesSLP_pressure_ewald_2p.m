@@ -131,6 +131,8 @@ end
 
 p = -(pr + pk);
 
+% Add on zero mode
+p = p - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 end
 
 

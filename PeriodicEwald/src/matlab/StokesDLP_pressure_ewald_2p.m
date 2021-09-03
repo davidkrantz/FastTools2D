@@ -164,11 +164,15 @@ if srcEqualsTar
    
    pself = xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);   
 end
-p = -2*(pr + pk + pself); 
+%p = -2*(pr + pk + pself); 
+p = pr + pk + pself; 
+
+% Add on zero mode
+p = p - sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);
 
 end
 
-%% Computing error estimates. Estimates come from PÃ¥lsson and Tornberg 2019 
+%% Computing error estimates. Estimates come from Pålsson and Tornberg 2019 
 % https://arxiv.org/pdf/1909.12581.pdf
 
 % -------------------------------------------------------------------------
