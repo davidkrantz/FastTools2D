@@ -58,7 +58,7 @@ ugrad_r = ugrad_r / (4*pi);
 
 end
 
-function ugrad_real = stresslet_gradient_real_sum(r1, r2, n1, n2, f1, f2, b1, b2, a)
+function ugrad_real = stresslet_gradient_real_sum(r1, r2, n1, n2, f1, f2, b1, b2, xi)
 
 ugrad_real = [0;0];
 
@@ -71,12 +71,12 @@ fdotn = n1*f1 + n2*f2;
 
 r = sqrt(r1^2 + r2^2);
 
-ugrad_real(1) = exp(-a^2*r^2)*(r1*rdotf*rdotn*rdotb*(8*a^4/r^2+16*a^2/r^4+16/r^6)...
-             -4*(1+a^2*r^2)*(b1*rdotf*rdotn+r1*bdotf*rdotn+r1*bdotn*rdotf)/r^4 ...
-            +2*a^2*(f1*bdotn+n1*bdotf+b1*fdotn-2*a^2*rdotb*(f1*rdotn+n1*rdotf+r1*fdotn)));
+ugrad_real(1) = exp(-xi^2*r^2)*(r1*rdotf*rdotn*rdotb*(8*xi^4/r^2+16*xi^2/r^4+16/r^6)...
+             -4*(1+xi^2*r^2)*(b1*rdotf*rdotn+r1*bdotf*rdotn+r1*bdotn*rdotf)/r^4 ...
+            +2*xi^2*(f1*bdotn+n1*bdotf+b1*fdotn-2*xi^2*rdotb*(f1*rdotn+n1*rdotf+r1*fdotn)));
 
-ugrad_real(2) = exp(-a^2*r^2)*(r2*rdotf*rdotn*rdotb*(8*a^4/r^2+16*a^2/r^4+16/r^6)...
-             -4*(1+a^2*r^2)*(b2*rdotf*rdotn+r2*bdotf*rdotn+r2*bdotn*rdotf)/r^4 ...
-             +2*a^2*(f2*bdotn+n2*bdotf+b2*fdotn-2*a^2*rdotb*(f2*rdotn+n2*rdotf+r2*fdotn)));
+ugrad_real(2) = exp(-xi^2*r^2)*(r2*rdotf*rdotn*rdotb*(8*xi^4/r^2+16*xi^2/r^4+16/r^6)...
+             -4*(1+xi^2*r^2)*(b2*rdotf*rdotn+r2*bdotf*rdotn+r2*bdotn*rdotf)/r^4 ...
+             +2*xi^2*(f2*bdotn+n2*bdotf+b2*fdotn-2*xi^2*rdotb*(f2*rdotn+n2*rdotf+r2*fdotn)));
 
 end
