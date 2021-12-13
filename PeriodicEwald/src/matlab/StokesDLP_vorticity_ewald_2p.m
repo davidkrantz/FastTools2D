@@ -159,7 +159,7 @@ end
 omega = omegar + omegak;
 
 % add on self contribution
-if ~isempty(equal_idx) > 0
+if ~isempty(equal_idx)
    qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
    nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
    btar_c = b1 + 1i*b2;
@@ -172,7 +172,7 @@ if ~isempty(equal_idx) > 0
    omega = omega + [imag(omegaself)'; -real(omegaself)'];   % mult with -1i
 end
 
-% add on zero mode 4*pi*i*x\dot(f\dot n)
+% add on zero mode 4*pi*i*x\dot(f\dot n) probably not needed
 %omega = omega + sum(-f2.*n1 + f1.*n2) / (2*Lx*Ly);
 %omega = omega + sum((f1.*ysrc - f2.*xsrc)) / (2*Lx*Ly);
 

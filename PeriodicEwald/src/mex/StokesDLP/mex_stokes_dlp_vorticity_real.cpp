@@ -120,8 +120,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         for(int j=tidx;j<tidx+ntargets_in_box[current_box];j++) {
             for(int k=sidx;k<sidx+nsources_in_box[current_box];k++) {
                 
-                //double r1 = -(psrc_a[2*k] - ptar_a[2*j]);
-                //double r2 = -(psrc_a[2*k+1] - ptar_a[2*j+1]);
                 double r1 = ptar_a[2*j] - psrc_a[2*k];
                 double r2 = ptar_a[2*j+1] - psrc_a[2*k+1];
                 
@@ -139,14 +137,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 
                 double rdotn = r1*n1 + r2*n2;
                 double rdotf = r1*f1 + r2*f2;
-                double fdotnperp = f1*n2 - f2*n1;
-                double ndotfperp = n1*f2 - n2*f1;
 
-                double rdot = r1*(f2*rdotn+n2*rdotf) - r2*(f1*rdotn+n1*rdotf);
-                double fdot = f1*r2*rdotn - f2*r1*rdotn;
-                double ndot = n1*r2*rdotf - n2*r1*rdotf;
+                double rdot = r1*(n2*rdotf+f2*rdotn) - r2*(n1*rdotf+f1*rdotn);
+                double ndot = n1*(r2*rdotf) - n2*(r1*rdotf);
+                double fdot = f1*(r2*rdotn) - f2*(r1*rdotn);
                 
-                omega[j] += e2*(4*(1+xi2*rSq)*rdot/(rSq*rSq) - 2*xi2*(fdotnperp+ndotfperp-2*xi*(fdot+ndot)));
+                omega[j] += e2*((1+xi2*rSq)*rdot/(rSq*rSq) + xi2*xi2*(ndot+fdot));
             }
         }
         
@@ -172,8 +168,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     int idx = box_offsets_src[source_box];
                     for(int l=0;l<nsources_in_box[source_box];l++,idx++) {
                         
-                        //double r1 = -(psrc_a[2*idx]-ptar_a[2*(tidx+k)]+zoff_re);
-                        //double r2 = -(psrc_a[2*idx+1]-ptar_a[2*(tidx+k)+1]+zoff_im);
                         double r1 = ptar_a[2*(tidx+k)]- (psrc_a[2*idx]+zoff_re);
                         double r2 = ptar_a[2*(tidx+k)+1] -(psrc_a[2*idx+1]+zoff_im);
                         
@@ -189,14 +183,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
                             double rdotn = r1*n1 + r2*n2;
                             double rdotf = r1*f1 + r2*f2;
-                            double fdotnperp = f1*n2 - f2*n1;
-                            double ndotfperp = n1*f2 - n2*f1;
 
-                            double rdot = r1*(f2*rdotn+n2*rdotf) - r2*(f1*rdotn+n1*rdotf);
-                            double fdot = f1*r2*rdotn - f2*r1*rdotn;
-                            double ndot = n1*r2*rdotf - n2*r1*rdotf;
+                            double rdot = r1*(n2*rdotf+f2*rdotn) - r2*(n1*rdotf+f1*rdotn);
+                            double ndot = n1*(r2*rdotf) - n2*(r1*rdotf);
+                            double fdot = f1*(r2*rdotn) - f2*(r1*rdotn);
 
-                            omega[tidx+k] += e2*(4*(1+xi2*rSq)*rdot/(rSq*rSq) - 2*xi2*(fdotnperp+ndotfperp-2*xi*(fdot+ndot)));
+                            omega[tidx+k] += e2*((1+xi2*rSq)*rdot/(rSq*rSq) + xi2*xi2*(ndot+fdot));
                         }
                     }
                 }
@@ -214,7 +206,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* omega_out = mxGetPr(plhs[0]);
 
     for(int j = 0;j<Ntar;j++) {
-        omega_out[particle_offsets_tar[j]] = omega[j] / (4*pi);
+        omega_out[particle_offsets_tar[j]] = omega[j]/pi;
     }
     
     /*Clean up. FF*/

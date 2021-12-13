@@ -55,21 +55,18 @@ end
 end
 
 function omega_real = vorticity_dlp_real_sum(r1, r2, n1, n2, f1, f2, xi)
-rdotn = r1*n1 + r2*n2;
 rdotf = r1*f1 + r2*f2;
-fdotnperp = f1*n2 - f2*n1;
-ndotfperp = n1*f2 - n2*f1;
+rdotn = r1*n1 + r2*n2;
 
-rdot = r1*(f2*rdotn+n2*rdotf) - r2*(f1*rdotn+n1*rdotf);
-fdot = f1*r2*rdotn - f2*r1*rdotn;
-ndot = n1*r2*rdotf - n2*r1*rdotf;
+rdot = r1*(n2*rdotf+f2*rdotn) - r2*(n1*rdotf+f1*rdotn);
+ndot = n1*(r2*rdotf) - n2*(r1*rdotf);
+fdot = f1*(r2*rdotn) - f2*(r1*rdotn);
 
 rSq = r1^2 + r2^2;
 xi2 = xi*xi;
-e2 = exp(-xi2*rSq);
 
-omega_real = e2*(4*(1+xi2*rSq)*rdot/(rSq*rSq) - ...
-    2*xi2*(fdotnperp+ndotfperp-2*xi*(fdot+ndot)))/(4*pi);
+omega_real = exp(-xi2*rSq)*((1+xi2*rSq)*rdot/(rSq*rSq) + xi2*xi2*(ndot+fdot))/pi;
+
 end
 
 
