@@ -63,4 +63,16 @@ matlab_add_mex(
 	LINK_TO gomp
 )
 
+matlab_add_mex(
+	NAME mex_stokes_dlp_stress_real
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_dlp_stress_real.cpp
+	LINK_TO gomp
+)
+
+matlab_add_mex(
+	NAME mex_stokes_dlp_stress_kspace
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_dlp_stress_kspace.cpp
+	LINK_TO gomp
+)
+
 set_target_properties(mex_stokes_dlp_kspace PROPERTIES R2017b R2017b)

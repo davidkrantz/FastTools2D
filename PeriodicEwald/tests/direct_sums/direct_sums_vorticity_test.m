@@ -32,8 +32,8 @@ n2 = sqrt(1 - n1.^2);
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
 
-xtar = Lx*rand(Nsrc,1);
-ytar = Ly*rand(Nsrc,1);
+xtar = Lx*rand(Ntar,1);
+ytar = Ly*rand(Ntar,1);
 
 %% Check single-layer potential
 fprintf("*********************************************************\n");

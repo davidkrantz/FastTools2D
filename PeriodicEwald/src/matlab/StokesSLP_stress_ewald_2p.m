@@ -1,17 +1,17 @@
-function [omega, omegar, omegak, xi] = StokesDLP_vorticity_ewald_2p(xsrc, ysrc,...
-            xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
+function [sigma1, sigma2, sigmar, sigmak, xi] = StokesSLP_stress_ewald_2p(xsrc, ysrc,...
+            xtar, ytar, f1, f2, b1, b2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-% Spectral Ewald evaluation of the doubly-periodic vorticity.
+% Spectral Ewald evaluation of the doubly-periodic Stokeslet.
 %
 % Input:
 %       xsrc, x component of source points
 %       ysrc, y component of source points 
 %       xtar, x component of target points
-%       ytar, y component of target points
-%       n1, x component of the normal vector at source points
-%       n2, y component of the normal vector at source points
+%       ytar, y component of target points 
 %       f1, x component of density function
 %       f2, y component of density function
+%       b1, x component of target direction vector
+%       b2, y component of target_direction vector
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
 %         'P', integer giving support points in each direction (default 24)
@@ -19,9 +19,10 @@ function [omega, omegar, omegak, xi] = StokesDLP_vorticity_ewald_2p(xsrc, ysrc,.
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
-%       omega, vorticity
-%       omega_r, real component of Ewald decomposition (as a 1xN matrix)
-%       omega_k, Fourier component of Ewald decomposition (as a 1xN matrix)
+%       sigma1, x component of stress
+%       sigma2, y component of stress
+%       sigmar, real component of Ewald decomposition (as a 2xN matrix)
+%       sigmar, Fourier component of Ewald decomposition (as a 2xN matrix)
 %       xi, Ewald parameter
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -61,34 +62,20 @@ if nargin > 8
 end
 
 % TO DO: ADD CHECKS ON INPUT DATA HERE
-zsrc = xsrc + 1i*ysrc;
-ztar = xtar + 1i*ytar;
-
-% Flag target indices that are source points
-I = ismember(zsrc, ztar);
-c = 1:length(zsrc);
-equal_idx = c(I);
-
 %% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
-% to work.
+% to work. 
 
 % Check to see first if it's necessary, for Matlab 2017a at least it isn't.
 v=ver('MATLAB');
 if v.Release~="(R2017a)"
     offset = 1e-60;
-    n1 = n1 - offset;
-    if n1 < -1
-        n1 = n1 + 2*offset;
-    end
-    n2 = sqrt(1 - n1.^2).*sign(n2);
-    
     f1 = f1 + offset;
     f2 = f2 + offset;
 end
 
 if verbose
     fprintf("*********************************************************\n");
-    fprintf("SPECTRAL EWALD FOR THE STOKES DOUBLE-LAYER POTENTIAL\n\n")
+    fprintf("SPECTRAL EWALD FOR THE STOKES SINGLE-LAYER POTENTIAL\n\n")
     fprintf("NUMBER OF SOURCES: %d\n", length(xsrc));
     fprintf("NUMBER OF TARGETS: %d\n", length(xtar));
     fprintf("TOLERANCE: %3.3e\n", tol);
@@ -105,7 +92,6 @@ ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 psrc = [xsrc';ysrc'];
 ptar = [xtar';ytar'];
 f = [f1';f2'];
-n = [n1';n2'];
 
 % compute parameters, rc, xi and kinf
 [A,B] = rat(Lx/Ly);
@@ -142,23 +128,47 @@ if verbose
     tic
 end
 
-omegar = mex_stokes_dlp_vorticity_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
+sigmar_tmp = mex_stokes_slp_stress_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
+
+sigmar = zeros(2,length(xtar));
+sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
+sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
     tic
 end
 
-omegak = mex_stokes_dlp_vorticity_kspace(psrc,ptar,f,n,xi,eta,Mx,My,Lx,Ly,w,P);
-
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-omega = omegar + omegak;
+sigmak_tmp = mex_stokes_slp_stress_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
+
+sigmak = zeros(2,length(xtar));
+sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(3,:).*b2';
+sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
+
+%sigmar = stokes_slp_stress_real_ds(xsrc, ysrc, xtar, ytar,...
+%                        f1, f2, b1, b2, Lx, Ly, xi);                   
+%sigmak = stokes_slp_stress_kspace_ds(xsrc, ysrc, xtar, ytar,...
+%                        f1, f2, b1, b2, Lx, Ly, xi, kinfx);
+
+% zero mode from double-layer velocity
+%uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+%uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+
+sigma = sigmar + sigmak;
+
+% add on zero-mode (from pressure)
+sigma = sigma + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+
+sigma1 = sigma(1,:)';
+sigma2 = sigma(2,:)';
 
 end
+
 
 %% Computing error estimates. Estimates come from Pålsson and Tornberg 2019 
 % https://arxiv.org/pdf/1909.12581.pdf

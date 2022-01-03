@@ -1,27 +1,31 @@
-function [omega, omegar, omegak, xi] = StokesDLP_vorticity_ewald_2p(xsrc, ysrc,...
-            xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
+function [sigma1, sigma2, sigmar, sigmak, xi] = StokesDLP_stress_ewald_2p(xsrc, ysrc,...
+                    xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-% Spectral Ewald evaluation of the doubly-periodic vorticity.
+% Spectral Ewald evaluation of the doubly-periodic double-layer potential.
 %
 % Input:
 %       xsrc, x component of source points
 %       ysrc, y component of source points 
 %       xtar, x component of target points
-%       ytar, y component of target points
+%       ytar, y component of target points 
 %       n1, x component of the normal vector at source points
 %       n2, y component of the normal vector at source points
 %       f1, x component of density function
 %       f2, y component of density function
+%       b1, x component of target direction vector
+%       b2, y component of target_direction vector
 %       Lx, the length of the periodic box in the x direction
 %       Ly, the length of the periodic box in the y direction
+%       vargargin can contain any or all of the following:
 %         'P', integer giving support points in each direction (default 24)
 %         'Nb', average number of points per box (default P*log2(#pts))
 %         'tol', error tolerance for truncation of sums (default 1e-16)
 %         'verbose', flag to write out parameter information
 % Output:
-%       omega, vorticity
-%       omega_r, real component of Ewald decomposition (as a 1xN matrix)
-%       omega_k, Fourier component of Ewald decomposition (as a 1xN matrix)
+%       sigma1, x component of stress
+%       sigma2, y component of stress
+%       sigmar, real component of Ewald decomposition (as a 2xN matrix)
+%       sigmar, Fourier component of Ewald decomposition (as a 2xN matrix)
 %       xi, Ewald parameter
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -70,8 +74,8 @@ c = 1:length(zsrc);
 equal_idx = c(I);
 
 %% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
-% to work.
-
+% to work. 
+%
 % Check to see first if it's necessary, for Matlab 2017a at least it isn't.
 v=ver('MATLAB');
 if v.Release~="(R2017a)"
@@ -85,6 +89,7 @@ if v.Release~="(R2017a)"
     f1 = f1 + offset;
     f2 = f2 + offset;
 end
+%%
 
 if verbose
     fprintf("*********************************************************\n");
@@ -96,20 +101,21 @@ if verbose
     fprintf("Points per box: %d\n", Nb);
 end
 
-%  Make sure the sources and targets are all inside the box.
-xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
-xtar = mod(xtar+Lx/2,Lx)-Lx/2;
-ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
-ytar = mod(ytar+Ly/2,Ly)-Ly/2;
+% Make sure the sources and targets are all inside the box.
+xsrc_ref = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar_ref = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc_ref = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar_ref = mod(ytar+Ly/2,Ly)-Ly/2;
 
-psrc = [xsrc';ysrc'];
-ptar = [xtar';ytar'];
+psrc = [xsrc_ref';ysrc_ref'];
+ptar = [xtar_ref';ytar_ref'];
 f = [f1';f2'];
 n = [n1';n2'];
 
 % compute parameters, rc, xi and kinf
 [A,B] = rat(Lx/Ly);
 
+npts = length(psrc)+length(ptar);
 Q = sum(sum(f.^2))+1;
 a = ceil(sqrt(npts/(Nb*A*B)));
 
@@ -142,21 +148,68 @@ if verbose
     tic
 end
 
-omegar = mex_stokes_dlp_vorticity_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
+sigmar_tmp = mex_stokes_dlp_stress_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
+
+sigmar = zeros(2,length(xtar));
+sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
+sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
     tic
 end
 
-omegak = mex_stokes_dlp_vorticity_kspace(psrc,ptar,f,n,xi,eta,Mx,My,Lx,Ly,w,P);
+sigmak_tmp = mex_stokes_dlp_stress_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
+
+sigmak = zeros(2,length(xtar));
+sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(3,:).*b2';
+sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
+
+%sigmar = stokes_dlp_stress_real_ds(xsrc, ysrc, xtar, ytar,...
+%                        n1, n2, f1, f2, b1, b2, Lx, Ly, xi);
+%sigmak = stokes_dlp_stress_kspace_ds(xsrc, ysrc, xtar, ytar,...
+%                        n1, n2, f1, f2, b1, b2, Lx, Ly, xi, kinfx);
+
+% check if something similar is needed
+% % Add on zero mode
+% uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+% uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-omega = omegar + omegak;
+% check if something similar is needed
+% % add on self-contribution
+% if ~isempty(equal_idx) > 0
+%    qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
+%    nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
+%    btar_c = b1 + 1i*b2;
+%    
+%    uself = xi^2*(qsrc_c.*real(btar_c.*conj(nsrc_c)) + ...
+%                 nsrc_c.*real(qsrc_c.*conj(btar_c)) +...
+%                 btar_c.*real(qsrc_c.*conj(nsrc_c)))/(2*pi);
+%             
+%    u = u + [real(uself)'; imag(uself)'];
+% end
+
+% add on self-contribution (from pressure)
+sigmaself = 0;
+if ~isempty(equal_idx) > 0
+   qsrc_c = f1 + 1i*f2;
+   nsrc_c = n1 + 1i*n2;
+   
+   sigmaself = -xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);   
+end
+
+sigma = sigmar + sigmak + sigmaself;
+
+% add on zero mode (from pressure)
+sigma = sigma + sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);
+
+sigma1 = sigma(1,:)';
+sigma2 = sigma(2,:)';
 
 end
 
@@ -172,14 +225,14 @@ function k = find_kinfb(Q,Lx,Ly,xi,tol)
 k = round(5*xi);       % Initial guess
 maxit = 1e2; it = 0;
 
-f = @(k) sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3*k))*exp(-k^2/(4*xi^2)) - tol;
-fp = @(k) -sqrt(4*Q*pi*max(Lx,Ly)/(Lx^3*Ly^3))*exp(-k^2/(4*xi^2))*...
-                (0.5*k^(-1.5) + sqrt(1/k)*2*k/(4*xi^2));
+f = @(k) sqrt(k*8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2)) - tol;
+fp = @(k) sqrt(8*pi*Q*max(Lx,Ly)/Lx^3*Ly^3)*exp(-k^2/(4*xi^2))*...
+            (0.5*k^(-1/2) - 2*k^(3/2)/(4*xi^2));
 
 %kdiff = 1;
 while abs(f(k)) > tol
     if it > maxit
-        disp("Couldn't find suitable k! Break")
+        warning('SEStresslet:find_kinfb','Max nbr of iterations reached');
         break;
     end
     
@@ -200,18 +253,16 @@ end
 function x = find_xi(Q,Lx,Ly,rc,tol)
 
 % Find xi using a Newton iteration
-x = 4/rc;       % Initial guess
+x = 1/rc;       % Initial guess
 maxit = 1e2; it = 0;
-
-% estimates from paper
-f = @(x) sqrt(Q * pi/(4*Lx*Ly*x))*exp(-x^2*rc^2) - tol;
-fp = @(x) -sqrt(Q*pi/(4*Lx*Ly))*exp(-x^2*rc^2)*(0.5*x^(-1.5)+...
-                2*rc^2*x*sqrt(1/x));
-
 %xdiff = 1;
+
+f = @(a) exp(-a^2*rc^2)*a*rc*sqrt(2*pi*Q/(Lx*Ly)) - tol;
+fp = @(a) (1 - 2*a^2*rc^2)*exp(-a^2*rc^2)*sqrt(2*pi*Q/(Lx*Ly))*rc;
+
 while abs(f(x)) > tol
     if it > maxit
-        disp("Couldn't find suitable xi! Break")
+        warning('SEStresslet:find_xi','Max nbr of iterations reached');
         break;
     end
     
