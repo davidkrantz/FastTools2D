@@ -162,13 +162,8 @@ end
 sigmak_tmp = mex_stokes_dlp_stress_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
 
 sigmak = zeros(2,length(xtar));
-sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(3,:).*b2';
-sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
-
-%sigmar = stokes_dlp_stress_real_ds(xsrc, ysrc, xtar, ytar,...
-%                        n1, n2, f1, f2, b1, b2, Lx, Ly, xi);
-%sigmak = stokes_dlp_stress_kspace_ds(xsrc, ysrc, xtar, ytar,...
-%                        n1, n2, f1, f2, b1, b2, Lx, Ly, xi, kinfx);
+sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(2,:).*b2';
+sigmak(2,:) = sigmak_tmp(3,:).*b1' + sigmak_tmp(4,:).*b2';
 
 % check if something similar is needed
 % % Add on zero mode
@@ -203,10 +198,13 @@ if ~isempty(equal_idx) > 0
    sigmaself = -xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);   
 end
 
-sigma = sigmar + sigmak + sigmaself;
+sigma = sigmar + sigmak;
+%sigma = sigmar + sigmak + sigmaself;
 
 % add on zero mode (from pressure)
-sigma = sigma + sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);
+%zero_mode = sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);  % zero mode is zero,
+%atleast for the pipe flow
+%sigma = sigma + zero_mode;
 
 sigma1 = sigma(1,:)';
 sigma2 = sigma(2,:)';

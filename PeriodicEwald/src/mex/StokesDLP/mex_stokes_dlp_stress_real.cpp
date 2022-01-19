@@ -97,7 +97,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double mu = 1.0;
 
     /*Loop through boxes*/
-#pragma omp parallel for    
+//#pragma omp parallel for    
     for(int current_box = 0;current_box<num_boxes;current_box++) {
         if(ntargets_in_box[current_box] == 0)
             continue;
@@ -131,48 +131,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 
                 //j = 1, l = 1
                 Ts[4*j] += e2*(1/(2*pi)*((fdotn-2*xi2*rdotf*rdotn)/rSq-2*rdotf*rdotn/(rSq*rSq))
-                    +2*mu*(r1*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                    +1/(4*pi)*2*mu*(r1*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                     -2*(1+xi2*rSq)*(f1*r1*rdotn+n1*r1*rdotf+r1*f1*rdotn+r1*n1*rdotf+2*rdotf*rdotn)/(rSq*rSq)
                     +2*xi2*(fdotn+n1*f1+f1*n1-xi2*(2*r1*r1*fdotn+r1*f1*rdotn+r1*n1*rdotf+f1*r1*rdotn+n1*r1*rdotf))));
                         
                 //j = 1, l = 2
-                Ts[4*j+1] += 2*mu*e2*(r1*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                Ts[4*j+1] += 1/(4*pi)*2*mu*e2*(r1*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                     -2*(1+xi2*rSq)*(f1*r2*rdotn+n1*r2*rdotf+r1*f2*rdotn+r1*n2*rdotf)/(rSq*rSq)
                     +2*xi2*(n1*f2+f1*n2-xi2*(2*r1*r2*fdotn+r1*f2*rdotn+r1*n2*rdotf+f1*r2*rdotn+n1*r2*rdotf)));
                 
                 //j = 2, l = 1
-                Ts[4*j+2] += 2*mu*e2*(r2*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                Ts[4*j+2] += 1/(4*pi)*2*mu*e2*(r2*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                     -2*(1+xi2*rSq)*(f2*r1*rdotn+n2*r1*rdotf+r2*f1*rdotn+r2*n1*rdotf)/(rSq*rSq)
                     +2*xi2*(n2*f1+f2*n1-xi2*(2*r2*r1*fdotn+r2*f1*rdotn+r2*n1*rdotf+f2*r1*rdotn+n2*r1*rdotf)));
                 
                 //j = 2, l = 2
                 Ts[4*j+3] += e2*(1/(2*pi)*((fdotn-2*xi2*rdotf*rdotn)/rSq-2*rdotf*rdotn/(rSq*rSq))
-                    +2*mu*(r2*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                    +1/(4*pi)*2*mu*(r2*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                     -2*(1+xi2*rSq)*(f2*r2*rdotn+n2*r2*rdotf+r2*f2*rdotn+r2*n2*rdotf+2*rdotf*rdotn)/(rSq*rSq)
                     +2*xi2*(fdotn+n2*f2+f2*n2-xi2*(2*r2*r2*fdotn+r2*f2*rdotn+r2*n2*rdotf+f2*r2*rdotn+n2*r2*rdotf))));
 
-                /*
-                // old
-                //j = 1, p = 1
-                Ts[4*j] += e2*(r1*r1*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(rdotf*rdotn + r1*f1*rdotn + r1*n1*rdotf)/rSq/rSq
-                             +2*xi2*(2*f1*n1+fdotn-2*xi2*r1*(f1*rdotn+n1*rdotf+r1*fdotn)));
-                
-                //j = 2, p = 1
-                Ts[4*j+1] += e2*(r1*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(r2*f1*rdotn + r2*n1*rdotf)/rSq/rSq
-                             +2*xi2*(f1*n2+n1*f2-2*xi2*r1*(f2*rdotn+n2*rdotf+r2*fdotn)));
-                
-                //j = 1, p = 2
-                Ts[4*j+2] += e2*(r1*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(r1*f2*rdotn + r1*n2*rdotf)/rSq/rSq
-                             +2*xi2*(f2*n1+f1*n2-2*xi2*r2*(f1*rdotn+n1*rdotf+r1*fdotn)));
-                
-                //j = 2, p = 2
-                Ts[4*j+3] += e2*(r2*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(rdotf*rdotn + r2*f2*rdotn + r2*n2*rdotf)/rSq/rSq
-                             +2*xi2*(2*f2*n2+fdotn-2*xi2*r2*(f2*rdotn+n2*rdotf+r2*fdotn)));
-                 */
             }
         }
         
@@ -215,48 +193,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             
                             //j = 1, l = 1
                             Ts[4*(tidx+k)] += e2*(1/(2*pi)*((fdotn-2*xi2*rdotf*rdotn)/rSq-2*rdotf*rdotn/(rSq*rSq))
-                                +2*mu*(r1*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                                +1/(4*pi)*2*mu*(r1*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                                 -2*(1+xi2*rSq)*(f1*r1*rdotn+n1*r1*rdotf+r1*f1*rdotn+r1*n1*rdotf+2*rdotf*rdotn)/(rSq*rSq)
                                 +2*xi2*(fdotn+n1*f1+f1*n1-xi2*(2*r1*r1*fdotn+r1*f1*rdotn+r1*n1*rdotf+f1*r1*rdotn+n1*r1*rdotf))));
 
                             //j = 1, l = 2
-                            Ts[4*(tidx+k)+1] += 2*mu*e2*(r1*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                            Ts[4*(tidx+k)+1] += 1/(4*pi)*2*mu*e2*(r1*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                                 -2*(1+xi2*rSq)*(f1*r2*rdotn+n1*r2*rdotf+r1*f2*rdotn+r1*n2*rdotf)/(rSq*rSq)
                                 +2*xi2*(n1*f2+f1*n2-xi2*(2*r1*r2*fdotn+r1*f2*rdotn+r1*n2*rdotf+f1*r2*rdotn+n1*r2*rdotf)));
 
                             //j = 2, l = 1
-                            Ts[4*(tidx+k)+2] += 2*mu*e2*(r2*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                            Ts[4*(tidx+k)+2] += 1/(4*pi)*2*mu*e2*(r2*r1*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                                 -2*(1+xi2*rSq)*(f2*r1*rdotn+n2*r1*rdotf+r2*f1*rdotn+r2*n1*rdotf)/(rSq*rSq)
                                 +2*xi2*(n2*f1+f2*n1-xi2*(2*r2*r1*fdotn+r2*f1*rdotn+r2*n1*rdotf+f2*r1*rdotn+n2*r1*rdotf)));
 
                             //j = 2, l = 2
                             Ts[4*(tidx+k)+3] += e2*(1/(2*pi)*((fdotn-2*xi2*rdotf*rdotn)/rSq-2*rdotf*rdotn/(rSq*rSq))
-                                +2*mu*(r2*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
+                                +1/(4*pi)*2*mu*(r2*r2*rdotf*rdotn*((8*xi2*xi2)/rSq+(16*xi2)/(rSq*rSq)+16/(rSq*rSq*rSq))
                                 -2*(1+xi2*rSq)*(f2*r2*rdotn+n2*r2*rdotf+r2*f2*rdotn+r2*n2*rdotf+2*rdotf*rdotn)/(rSq*rSq)
                                 +2*xi2*(fdotn+n2*f2+f2*n2-xi2*(2*r2*r2*fdotn+r2*f2*rdotn+r2*n2*rdotf+f2*r2*rdotn+n2*r2*rdotf))));
-                
-                            /*
-                            //old
-                            //j = 1, p = 1
-                            Ts[4*(tidx+k)] += e2*(r1*r1*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(rdotf*rdotn + r1*f1*rdotn + r1*n1*rdotf)/rSq/rSq
-                             +2*xi2*(2*f1*n1+fdotn-2*xi2*r1*(f1*rdotn+n1*rdotf+r1*fdotn)));
-                            
-                            //j = 2, p = 1
-                            Ts[4*(tidx+k)+1] += e2*(r1*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(r2*f1*rdotn + r2*n1*rdotf)/rSq/rSq
-                             +2*xi2*(f1*n2+n1*f2-2*xi2*r1*(f2*rdotn+n2*rdotf+r2*fdotn)));
-                            
-                            //j = 1, p = 2
-                            Ts[4*(tidx+k)+2] += e2*(r1*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(r1*f2*rdotn + r1*n2*rdotf)/rSq/rSq
-                             +2*xi2*(f2*n1+f1*n2-2*xi2*r2*(f1*rdotn+n1*rdotf+r1*fdotn)));
-                            
-                            //j = 2, p = 2
-                            Ts[4*(tidx+k)+3] += e2*(r2*r2*rdotf*rdotn*(8*xi2*xi2/rSq + 16*xi2/rSq/rSq + 16/rSq/rSq/rSq)
-                             -4*(1+xi2*rSq)*(rdotf*rdotn + r2*f2*rdotn + r2*n2*rdotf)/rSq/rSq
-                             +2*xi2*(2*f2*n2+fdotn-2*xi2*r2*(f2*rdotn+n2*rdotf+r2*fdotn)));
-                             */
+
                         }
                     }
                 }
@@ -274,10 +230,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* T = mxGetPr(plhs[0]);
 
     for(int j = 0;j<Ntar;j++) {
-        T[4*particle_offsets_tar[j]] = Ts[4*j]/4/pi;
-        T[4*particle_offsets_tar[j]+1] = Ts[4*j+1]/4/pi;
-        T[4*particle_offsets_tar[j]+2] = Ts[4*j+2]/4/pi;
-        T[4*particle_offsets_tar[j]+3] = Ts[4*j+3]/4/pi;
+        T[4*particle_offsets_tar[j]] = Ts[4*j];
+        T[4*particle_offsets_tar[j]+1] = Ts[4*j+1];
+        T[4*particle_offsets_tar[j]+2] = Ts[4*j+2];
+        T[4*particle_offsets_tar[j]+3] = Ts[4*j+3];
     }
     
     _mm_mxFree(Ts);

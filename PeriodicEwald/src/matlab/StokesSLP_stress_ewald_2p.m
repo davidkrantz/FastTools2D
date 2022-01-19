@@ -69,6 +69,12 @@ end
 v=ver('MATLAB');
 if v.Release~="(R2017a)"
     offset = 1e-60;
+    b1 = b1 - offset;
+    if b1 < -1
+        b1 = b1 + 2*offset;
+    end
+    b2 = sqrt(1 - b1.^2).*sign(b2);
+    
     f1 = f1 + offset;
     f2 = f2 + offset;
 end
@@ -92,6 +98,7 @@ ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 psrc = [xsrc';ysrc'];
 ptar = [xtar';ytar'];
 f = [f1';f2'];
+b = [b1';b2'];
 
 % compute parameters, rc, xi and kinf
 [A,B] = rat(Lx/Ly);
@@ -130,9 +137,16 @@ end
 
 sigmar_tmp = mex_stokes_slp_stress_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
 
+% needed if wanting to use mex_new. But can be left like this in the other
+% case as well, makes no difference.
+b1tmp = b1(1)*ones(length(ptar),1);
+b2tmp = b2(1)*ones(length(ptar),1);
 sigmar = zeros(2,length(xtar));
-sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
-sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
+sigmar(1,:) = sigmar_tmp(1,:).*b1tmp' + sigmar_tmp(2,:).*b2tmp';
+sigmar(2,:) = sigmar_tmp(3,:).*b1tmp' + sigmar_tmp(4,:).*b2tmp';
+
+%sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
+%sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
@@ -144,11 +158,23 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
+% don't know why row 2 and 3 are different, they should be equal. If I use
+% row 2 in both places I get good result in pipe flow when running with eta
+% = inf, i.e. having only the SLP.
 sigmak_tmp = mex_stokes_slp_stress_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
-
 sigmak = zeros(2,length(xtar));
-sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(3,:).*b2';
+sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(2,:).*b2';
 sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
+
+% this gives zero error between ds and ewald. Pipe flow gives good result
+% when using mex_new, but also if we use the normal old code above.
+%sigmak = mex_new(psrc,ptar,xi,eta,f,b,Mx,My,Lx,Ly,w,P);
+
+% add on zero-mode
+%n1 = b1(1)*ones(size(f1));
+%n2 = b2(1)*ones(size(f2));
+%sigmak(1,:) = sigmak(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
+%sigmak(2,:) = sigmak(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 %sigmar = stokes_slp_stress_real_ds(xsrc, ysrc, xtar, ytar,...
 %                        f1, f2, b1, b2, Lx, Ly, xi);                   
@@ -160,10 +186,9 @@ sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
 %uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 sigma = sigmar + sigmak;
-
-% add on zero-mode (from pressure)
-sigma = sigma + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
-
+%sigma(1,:) = sigma(1,:) + sum((f1.*b1 + f2.*b2).*xsrc) / (Lx*Ly);
+%sigma(2,:) = sigma(2,:) + sum((f1.*b1 + f2.*b2).*ysrc) / (Lx*Ly);
+%sigma = sigma + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 sigma1 = sigma(1,:)';
 sigma2 = sigma(2,:)';
 

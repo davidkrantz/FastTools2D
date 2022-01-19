@@ -153,26 +153,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             double kdotq_re = k1 * q1_re + k2 * q2_re;
             double kdotq_im = k1 * q1_im + k2 * q2_im;
-            
-            /*
-            // multiply everything by 1i
-            //j = 1, l = 1
-            Hhat1_re[ptr] = -(-2*(k1*k1*kdotq_im)/Ksq)*e;
-            Hhat1_im[ptr] = (-2*(k1*k1*kdotq_re)/Ksq)*e;
-            
-            //j = 1, l = 2
-            Hhat2_re[ptr] = -(-2*(k1*k2*kdotq_im)/Ksq)*e;
-            Hhat2_im[ptr] = (-2*(k1*k2*kdotq_re)/Ksq)*e;
-            
-            //j = 2, l = 1
-            Hhat3_re[ptr] = Hhat2_re[ptr];//-(-2*(k1*k2*kdotq_im)/Ksq)*e;
-            Hhat3_im[ptr] = Hhat2_im[ptr];//(-2*(k1*k2*kdotq_re)/Ksq)*e;
-            
-            //j = 2, l = 2
-            Hhat4_re[ptr] = -(-2*(k2*k2*kdotq_im)/Ksq)*e;
-            Hhat4_im[ptr] = (-2*(k2*k2*kdotq_re)/Ksq)*e;
-            */
-            
+
             // multiply everything by 1i
             //j = 1, l = 1
             Hhat1_re[ptr] = -(kdotq_im + q1_im*k1 + q1_im*k1 - 2*(k1*k1*kdotq_im)/Ksq)*e;
@@ -206,26 +187,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             double kdotq_re = k1 * q1_re + k2 * q2_re;
             double kdotq_im = k1 * q1_im + k2 * q2_im;
-            
-            /*
-            // multiply everything by 1i
-            //j = 1, l = 1
-            Hhat1_re[ptr] = -(-2*(k1*k1*kdotq_im)/Ksq)*e;
-            Hhat1_im[ptr] = (-2*(k1*k1*kdotq_re)/Ksq)*e;
-            
-            //j = 1, l = 2
-            Hhat2_re[ptr] = -(-2*(k1*k2*kdotq_im)/Ksq)*e;
-            Hhat2_im[ptr] = (-2*(k1*k2*kdotq_re)/Ksq)*e;
-            
-            //j = 2, l = 1
-            Hhat3_re[ptr] = Hhat2_re[ptr];//-(-2*(k1*k2*kdotq_im)/Ksq)*e;
-            Hhat3_im[ptr] = Hhat2_im[ptr];//(-2*(k1*k2*kdotq_re)/Ksq)*e;
-            
-            //j = 2, l = 2
-            Hhat4_re[ptr] = -(-2*(k2*k2*kdotq_im)/Ksq)*e;
-            Hhat4_im[ptr] = (-2*(k2*k2*kdotq_re)/Ksq)*e;
-             */
-            
+
             // multiply everything by 1i
             //j = 1, l = 1
             Hhat1_re[ptr] = -(kdotq_im + q1_im*k1 + q1_im*k1 - 2*(k1*k1*kdotq_im)/Ksq)*e;

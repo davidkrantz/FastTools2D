@@ -27,7 +27,7 @@ Ntar = size(xtar,1);
 sigmak = zeros(2,Ntar);
  
 %Source points
-parfor n = 1:Nsrc  
+for n = 1:Nsrc  
     
     sigma_tmp = zeros(2,Ntar);
     

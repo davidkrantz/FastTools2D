@@ -145,7 +145,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //possibly use fast gaussian gridding here too, to get rid of the
     //exponentials, but as this loop accounts for a few percent of the
     //total runtime, this hardly seems worth the extra work.
-#pragma omp parallel for
+//#pragma omp parallel for
     for(int j = 0;j<Mx;j++) {
         int ptr = j*My;
         double k1;
@@ -205,49 +205,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 +k2*(k1*f1n2_im+k2*f2n2_im)+k2*(k1*f2n1_im+k2*f2n2_im)+k2*(k1*f1n2_im+k2*f2n2_im)
                 -4*k2*k2*(k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq));
             
-            /*
-            //old
-            //j = 1, p = 1
-            Hhat1_re[ptr] = -k1*(2*f1n1_re*k1 + k2*(f1n2_re + f2n1_re) 
-                                + k1*(f1n1_re + f2n2_re) 
-                                - 2*k1*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat1_im[ptr] = -k1*(2*f1n1_im*k1 + k2*(f1n2_im + f2n1_im) 
-                                + k1*(f1n1_im + f2n2_im) 
-                                - 2*k1*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;
-            
-            //j = 2, p = 1
-            Hhat2_re[ptr] = -k1*(2*f2n2_re*k2 + k1*(f1n2_re + f2n1_re) 
-                                + k2*(f1n1_re + f2n2_re) 
-                                - 2*k2*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat2_im[ptr] = -k1*(2*f2n2_im*k2 + k1*(f1n2_im + f2n1_im) 
-                                + k2*(f1n1_im + f2n2_im) 
-                                - 2*k2*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;    
-            
-            //j = 1, p = 2
-            Hhat3_re[ptr] = -k2*(2*f1n1_re*k1 + k2*(f1n2_re + f2n1_re) 
-                                + k1*(f1n1_re + f2n2_re) 
-                                - 2*k1*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat3_im[ptr] = -k2*(2*f1n1_im*k1 + k2*(f1n2_im + f2n1_im) 
-                                + k1*(f1n1_im + f2n2_im) 
-                                - 2*k1*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;
-            
-            //j = 2, p = 2
-            Hhat4_re[ptr] = -k2*(2*f2n2_re*k2 + k1*(f1n2_re + f2n1_re) 
-                                + k2*(f1n1_re + f2n2_re) 
-                                - 2*k2*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat4_im[ptr] = -k2*(2*f2n2_im*k2 + k1*(f1n2_im + f2n1_im) 
-                                + k2*(f1n1_im + f2n2_im) 
-                                - 2*k2*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;
-             */
-            
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
             double k2 = 2.0*pi/Ly*(k-My/2+1);
@@ -300,48 +257,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 +k2*(k1*f1n2_im+k2*f2n2_im)+k2*(k1*f2n1_im+k2*f2n2_im)+k2*(k1*f1n2_im+k2*f2n2_im)
                 -4*k2*k2*(k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq));
             
-            /*
-            //old
-            //j = 1, p = 1
-            Hhat1_re[ptr] = -k1*(2*f1n1_re*k1 + k2*(f1n2_re + f2n1_re) 
-                                + k1*(f1n1_re + f2n2_re) 
-                                - 2*k1*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat1_im[ptr] = -k1*(2*f1n1_im*k1 + k2*(f1n2_im + f2n1_im) 
-                                + k1*(f1n1_im + f2n2_im) 
-                                - 2*k1*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;
-            
-            //j = 2, p = 1
-            Hhat2_re[ptr] = -k1*(2*f2n2_re*k2 + k1*(f1n2_re + f2n1_re) 
-                                + k2*(f1n1_re + f2n2_re) 
-                                - 2*k2*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat2_im[ptr] = -k1*(2*f2n2_im*k2 + k1*(f1n2_im + f2n1_im) 
-                                + k2*(f1n1_im + f2n2_im) 
-                                - 2*k2*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;    
-            
-            //j = 1, p = 2
-            Hhat3_re[ptr] = -k2*(2*f1n1_re*k1 + k2*(f1n2_re + f2n1_re) 
-                                + k1*(f1n1_re + f2n2_re) 
-                                - 2*k1*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat3_im[ptr] = -k2*(2*f1n1_im*k1 + k2*(f1n2_im + f2n1_im) 
-                                + k1*(f1n1_im + f2n2_im) 
-                                - 2*k1*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e;
-            
-            //j = 2, p = 2
-            Hhat4_re[ptr] = -k2*(2*f2n2_re*k2 + k1*(f1n2_re + f2n1_re) 
-                                + k2*(f1n1_re + f2n2_re) 
-                                - 2*k2*(k1*k1*f1n1_re + k1*k2*(f1n2_re + f2n1_re) 
-                                + k2*k2*f2n2_re)/Ksq)*e;
-            Hhat4_im[ptr] = -k2*(2*f2n2_im*k2 + k1*(f1n2_im + f2n1_im) 
-                                + k2*(f1n1_im + f2n2_im) 
-                                - 2*k2*(k1*k1*f1n1_im + k1*k2*(f1n2_im + f2n1_im) 
-                                + k2*k2*f2n2_im)/Ksq)*e; 
-             */
         }
     }
     

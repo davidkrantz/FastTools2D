@@ -14,7 +14,7 @@ if(APPLE)
 
     set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -undefined dynamic_lookup")
 
-    set(Matlab_ROOT_DIR "/Applications/MATLAB_R2019a.app")
+    set(Matlab_ROOT_DIR "/Applications/MATLAB_R2021a.app")
     set(CMAKE_MACOSX_RPATH 1)
 
 endif(APPLE)

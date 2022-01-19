@@ -25,7 +25,7 @@ Ntar = size(xtar,1);
 sigmak = zeros(2,Ntar);
 
 %Source points
-parfor n = 1:Nsrc
+for n = 1:Nsrc
     
     sigma_tmp = zeros(2,Ntar);
     
@@ -71,17 +71,13 @@ bdotf = f1*b1 + f2*b2;
 
 kSq = k1^2 + k2^2;
 xi2 = xi*xi;
-%eee = exp(-kSq/(4*xi2))*(1+kSq/(4*xi2))/kSq;
+e = exp(-kSq/(4*xi2))*(1+kSq/(4*xi2))/kSq;
 
-%sigmak(1) = 1i*eee*(-2*(k1*kdotb*kdotf)/kSq);
+sigmak(1) = 1i*(b1*kdotf+f1*kdotb+k1*bdotf - ...
+    2*(k1*kdotb*kdotf)/kSq)*e;
 
-%sigmak(2) = 1i*eee*(-2*(k2*kdotb*kdotf)/kSq);
-
-sigmak(1) = 1i*exp(-kSq/(4*xi2))*(b1*kdotf+f1*kdotb+k1*bdotf - ...
-    2*k1*kdotb*kdotf/kSq)*(1+kSq/(4*xi2))/kSq;
-
-sigmak(2) = 1i*exp(-kSq/(4*xi2))*(b2*kdotf+f2*kdotb+k2*bdotf - ...
-    2*k2*kdotb*kdotf/kSq)*(1+kSq/(4*xi2))/kSq;
+sigmak(2) = 1i*(b2*kdotf+f2*kdotb+k2*bdotf - ...
+    2*(k2*kdotb*kdotf)/kSq)*e;
 
 end
 
