@@ -165,46 +165,37 @@ sigmak = zeros(2,length(xtar));
 sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(2,:).*b2';
 sigmak(2,:) = sigmak_tmp(3,:).*b1' + sigmak_tmp(4,:).*b2';
 
-% check if something similar is needed
-% % Add on zero mode
-% uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-% uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-% check if something similar is needed
-% % add on self-contribution
-% if ~isempty(equal_idx) > 0
-%    qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
-%    nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
-%    btar_c = b1 + 1i*b2;
-%    
-%    uself = xi^2*(qsrc_c.*real(btar_c.*conj(nsrc_c)) + ...
-%                 nsrc_c.*real(qsrc_c.*conj(btar_c)) +...
-%                 btar_c.*real(qsrc_c.*conj(nsrc_c)))/(2*pi);
-%             
-%    u = u + [real(uself)'; imag(uself)'];
-% end
-
-% add on self-contribution (from pressure)
+% add on self-contribution
 sigmaself = 0;
 if ~isempty(equal_idx) > 0
-   qsrc_c = f1 + 1i*f2;
-   nsrc_c = n1 + 1i*n2;
-   
-   sigmaself = -xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);   
+    qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
+    nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
+    btar_c = b1 + 1i*b2;
+
+    % velocity gradient
+    ugradself = xi^2*(qsrc_c.*real(btar_c.*conj(nsrc_c)) + ...
+        nsrc_c.*real(qsrc_c.*conj(btar_c)) + ...
+        btar_c.*real(qsrc_c.*conj(nsrc_c)))/(2*pi);
+
+    % pressure
+    pself = xi^2*real(qsrc_c.*conj(nsrc_c))/(2*pi);
+    
+    % stress
+    sigmaself = -[pself'; pself'] + 2*[real(ugradself)'; imag(ugradself)'];
 end
 
-sigma = sigmar + sigmak;
-%sigma = sigmar + sigmak + sigmaself;
+
+%sigma = sigmar + sigmak;
+sigma = sigmar + sigmak + sigmaself;
 
 % add on zero mode (from pressure)
-%zero_mode = sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);  % zero mode is zero,
-%atleast for the pipe flow
-%sigma = sigma + zero_mode;
+zero_mode = sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);  % zero mode is zero, atleast for the pipe flow
+sigma = sigma - zero_mode;
 
 sigma1 = sigma(1,:)';
 sigma2 = sigma(2,:)';

@@ -139,14 +139,14 @@ sigmar_tmp = mex_stokes_slp_stress_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
 
 % needed if wanting to use mex_new. But can be left like this in the other
 % case as well, makes no difference.
-b1tmp = b1(1)*ones(length(ptar),1);
-b2tmp = b2(1)*ones(length(ptar),1);
-sigmar = zeros(2,length(xtar));
-sigmar(1,:) = sigmar_tmp(1,:).*b1tmp' + sigmar_tmp(2,:).*b2tmp';
-sigmar(2,:) = sigmar_tmp(3,:).*b1tmp' + sigmar_tmp(4,:).*b2tmp';
+%b1tmp = b1(1)*ones(length(ptar),1);
+%b2tmp = b2(1)*ones(length(ptar),1);
+%sigmar = zeros(2,length(xtar));
+%sigmar(1,:) = sigmar_tmp(1,:).*b1tmp' + sigmar_tmp(2,:).*b2tmp';
+%sigmar(2,:) = sigmar_tmp(3,:).*b1tmp' + sigmar_tmp(4,:).*b2tmp';
 
-%sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
-%sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
+sigmar(1,:) = sigmar_tmp(1,:).*b1' + sigmar_tmp(2,:).*b2';
+sigmar(2,:) = sigmar_tmp(3,:).*b1' + sigmar_tmp(4,:).*b2';
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
