@@ -66,7 +66,7 @@ function pk = stokeslet_pressure_k_sum(k1, k2, f1, f2, xi)
     kdotf = k1*f1 + k2*f2;
     k = sqrt(k1^2 + k2^2);
     
-    pk = -1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
+    pk = 1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
 end
 
 

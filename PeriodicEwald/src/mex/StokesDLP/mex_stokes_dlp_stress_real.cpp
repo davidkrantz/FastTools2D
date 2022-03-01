@@ -97,7 +97,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double mu = 1.0;
 
     /*Loop through boxes*/
-//#pragma omp parallel for    
+#pragma omp parallel for    
     for(int current_box = 0;current_box<num_boxes;current_box++) {
         if(ntargets_in_box[current_box] == 0)
             continue;

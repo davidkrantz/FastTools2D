@@ -145,7 +145,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //possibly use fast gaussian gridding here too, to get rid of the
     //exponentials, but as this loop accounts for a few percent of the
     //total runtime, this hardly seems worth the extra work.
-//#pragma omp parallel for
+#pragma omp parallel for
     for(int j = 0;j<Mx;j++) {
         int ptr = j*My;
         double k1;

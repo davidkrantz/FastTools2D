@@ -170,30 +170,16 @@ sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
 % when using mex_new, but also if we use the normal old code above.
 %sigmak = mex_new(psrc,ptar,xi,eta,f,b,Mx,My,Lx,Ly,w,P);
 
-% add on zero-mode
-%n1 = b1(1)*ones(size(f1));
-%n2 = b2(1)*ones(size(f2));
-%sigmak(1,:) = sigmak(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-%sigmak(2,:) = sigmak(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-
-%sigmar = stokes_slp_stress_real_ds(xsrc, ysrc, xtar, ytar,...
-%                        f1, f2, b1, b2, Lx, Ly, xi);                   
-%sigmak = stokes_slp_stress_kspace_ds(xsrc, ysrc, xtar, ytar,...
-%                        f1, f2, b1, b2, Lx, Ly, xi, kinfx);
-
-% zero mode from double-layer velocity
-%uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-%uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
-
 sigma = sigmar + sigmak;
-%sigma(1,:) = sigma(1,:) + sum((f1.*b1 + f2.*b2).*xsrc) / (Lx*Ly);
-%sigma(2,:) = sigma(2,:) + sum((f1.*b1 + f2.*b2).*ysrc) / (Lx*Ly);
-%sigma = sigma + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+
+% add on zero mode (from pressure)
+zero_mode = -sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+sigma = sigma - zero_mode;
+
 sigma1 = sigma(1,:)';
 sigma2 = sigma(2,:)';
 
 end
-
 
 %% Computing error estimates. Estimates come from Pålsson and Tornberg 2019 
 % https://arxiv.org/pdf/1909.12581.pdf

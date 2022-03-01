@@ -116,6 +116,7 @@ if verbose
 end
 
 pr = mex_stokes_slp_pressure_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
+%pr = stokes_slp_pressure_real_ds(xsrc,ysrc,xtar,ytar,f1',f2',Lx,Ly,xi);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
@@ -123,6 +124,7 @@ if verbose
 end
 
 pk = mex_stokes_slp_pressure_kspace(psrc,ptar,f,xi,eta,Mx,My,Lx,Ly,w,P);
+%pk = stokes_slp_pressure_kspace_ds(xsrc,ysrc,xtar,ytar,f1',f2',Lx,Ly,xi,kinfx);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);

@@ -189,7 +189,6 @@ if ~isempty(equal_idx) > 0
     sigmaself = -[pself'; pself'] + 2*[real(ugradself)'; imag(ugradself)'];
 end
 
-
 %sigma = sigmar + sigmak;
 sigma = sigmar + sigmak + sigmaself;
 

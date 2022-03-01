@@ -144,7 +144,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             int t_y = (per_source_y+nside_y)%nside_y;
             //The number of the source nearest neighbor box.
             int source_box = t_y*nside_x + t_x;
-            
+                
             if(nsources_in_box[source_box] > 0) {
                 //z-offset of the source box corrected for periodicity.
                 double zoff_re = (Lx*(per_source_x-t_x))/nside_x;
@@ -155,7 +155,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                     int idx = box_offsets_src[source_box];
                     for(int l=0;l<nsources_in_box[source_box];l++,idx++) {
                         
-                        double r1 = ptar_a[2*(tidx+k)] -  (psrc_a[2*idx] + zoff_re);
+                        double r1 = ptar_a[2*(tidx+k)] - (psrc_a[2*idx] + zoff_re);
                         double r2 = ptar_a[2*(tidx+k)+1] - (psrc_a[2*idx+1] + zoff_im);
                         
                         double f1 = f_a[2*idx];

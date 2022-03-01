@@ -128,7 +128,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
    // mexPrintf("xi : %f, rc : %e, numboxes = %d\n", xi, sqrt(cutoffsq), num_boxes);
 //     mexPrintf("R1 : %f, R2 : %f\n",cutoffsq,36.0/xi/xi);
 
-//#pragma omp parallel for
+#pragma omp parallel for
 /*Loop through boxes*/
 /*------------------------------------------------------------------------
  *Commands starting with _m or __m are SSE commands. SSE = Streaming SIMD Extensions.   *It is a set of CPU instructions dedicated to applications like scientific computation.

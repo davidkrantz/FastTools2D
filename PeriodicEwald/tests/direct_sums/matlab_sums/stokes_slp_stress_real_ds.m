@@ -66,13 +66,13 @@ rdotf = r1*f1 + r2*f2;
 rdotb = r1*b1 + r2*b2;
 bdotf = f1*b1 + f2*b2;
 
-rSq = r1^2 + r2^2;
+rSq = r1*r1 + r2*r2;
 xi2 = xi*xi;
 
 sigma_real(1) = exp(-xi2*rSq)*(2*xi2*(b1*rdotf+f1*rdotb+r1*bdotf) - ...
-    4*r1*rdotb*rdotf/(rSq*rSq)*(1+xi2*rSq));
+    (4*r1*rdotb*rdotf/(rSq*rSq))*(1+xi2*rSq));
 
 sigma_real(2) = exp(-xi2*rSq)*(2*xi2*(b2*rdotf+f2*rdotb+r2*bdotf) - ...
-    4*r2*rdotb*rdotf/(rSq*rSq)*(1+xi2*rSq));
+    (4*r2*rdotb*rdotf/(rSq*rSq))*(1+xi2*rSq));
 
 end
