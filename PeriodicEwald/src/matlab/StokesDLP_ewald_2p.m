@@ -33,7 +33,7 @@ P = 24;
 % average number of points per box for real space sum
 Nb = min(P*round(log2(npts)), npts/4);
 % tolerance, used to get parameters from estimates
-tol = 1e-16;  
+tol = 1e-16;
 % print diagnostic information
 verbose = 0;
 
@@ -90,14 +90,14 @@ if verbose
     fprintf("Points per box: %d\n", Nb);
 end
 
-%  Make sure the sources and targets are all inside the box.
-xsrc_ref = mod(xsrc+Lx/2,Lx)-Lx/2;
-xtar_ref = mod(xtar+Lx/2,Lx)-Lx/2;
-ysrc_ref = mod(ysrc+Ly/2,Ly)-Ly/2;
-ytar_ref = mod(ytar+Ly/2,Ly)-Ly/2;
+% Make sure the sources and targets are all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 
-psrc = [xsrc_ref';ysrc_ref'];
-ptar = [xtar_ref';ytar_ref'];
+psrc = [xsrc';ysrc'];
+ptar = [xtar';ytar'];
 f = [f1';f2'];
 n = [n1';n2'];
 
@@ -155,7 +155,7 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
-u = ur + uk; % negative sign to match convention
+u = ur + uk;
 
 u1 = u(1,:)';
 u2 = u(2,:)';

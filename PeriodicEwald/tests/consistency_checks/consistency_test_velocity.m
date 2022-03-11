@@ -8,6 +8,13 @@ clc
 
 initewald
 
+% Test parameters
+test_self = 0;
+Nsrc = 10000;
+Ntar = 10000;
+Lx_value = 1;
+Ly_value = 2;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Single-layer potential 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,22 +23,25 @@ fprintf('Checking consistency of single-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 10000;
-Ntar = 10000;
-
-Lx = 1;
-Ly = 2;
+% Length of periodic box
+Lx = Lx_value;
+Ly = Ly_value;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
 f2 = 10*rand(Nsrc,1);
 
-% Source and target loccations
+% Source and target locations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
 
-xtar = Lx*rand(Ntar,1);
-ytar = Ly*rand(Ntar,1);
+if test_self
+    xtar = xsrc;
+    ytar = ysrc;
+else
+    xtar = Lx*rand(Ntar,1);
+    ytar = Ly*rand(Ntar,1);
+end
 
 %% Compute solution with Spectral Ewald
 % Here we change Nb, the number of points in each box in the real space
@@ -91,11 +101,9 @@ fprintf('Checking consistency of double-layer potential...\n');
 fprintf("*********************************************************\n\n");
 
 %% Set up data
-Nsrc = 10000;
-Ntar = 10000;
-
-Lx = 1;
-Ly = 2;
+% Length of periodic box
+Lx = Lx_value;
+Ly = Ly_value;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
@@ -105,12 +113,17 @@ f2 = 10*rand(Nsrc,1);
 n1 = rand(Nsrc,1);
 n2 = sqrt(1 - n1.^2);
 
-% Source and target loccations
+% Source and target locations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
 
-xtar = Lx*rand(Ntar,1);
-ytar = Ly*rand(Ntar,1);
+if test_self
+    xtar = xsrc;
+    ytar = ysrc;
+else
+    xtar = Lx*rand(Ntar,1);
+    ytar = Ly*rand(Ntar,1);
+end
 
 %% Compute solution with Spectral Ewald, try with a number of bins
 
@@ -146,7 +159,12 @@ fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
 
 u1 = u1 + 1i*u2;
 
-% Subtract off zero mode
+% Subtract off zero mode, but first make sure the sources and targets are
+% all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 u1 = u1 - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
 u1 = u1 - 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
@@ -163,11 +181,14 @@ Lx = 2*Lx;
 
 u2 = u3 + 1i*u4;
 
-% Subtract off zero mode
+% Subtract off zero mode, but first make sure the sources and targets are
+% all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 u2 = u2 - sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
 u2 = u2 - 1i*sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
     max(abs(u1 - u2)));
-
-
