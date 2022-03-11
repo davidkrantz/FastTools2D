@@ -70,7 +70,7 @@ if verbose
     fprintf("Points per box: %d\n", Nb);
 end
 
-%  Make sure the sources and targets are all inside the box.
+% Make sure the sources and targets are all inside the box.
 xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 xtar = mod(xtar+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
@@ -116,7 +116,6 @@ if verbose
 end
 
 pr = mex_stokes_slp_pressure_real(psrc,ptar,f,xi,nside_x,nside_y,Lx,Ly);
-%pr = stokes_slp_pressure_real_ds(xsrc,ysrc,xtar,ytar,f1',f2',Lx,Ly,xi);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
@@ -124,17 +123,17 @@ if verbose
 end
 
 pk = mex_stokes_slp_pressure_kspace(psrc,ptar,f,xi,eta,Mx,My,Lx,Ly,w,P);
-%pk = stokes_slp_pressure_kspace_ds(xsrc,ysrc,xtar,ytar,f1',f2',Lx,Ly,xi,kinfx);
+
+% Add on zero mode
+pk = pk + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-p = -(pr + pk);
+p = pr + pk;
 
-% Add on zero mode
-p = p - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 end
 
 

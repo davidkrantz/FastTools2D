@@ -61,6 +61,9 @@ end
 
 pk = real(pk)/(Lx*Ly);
 
+% Add on zero mode
+pk = pk + -(sum((n1.*f1 + n2.*f2))/(2*Lx*Ly));
+
 end
 
 function pk = stresslet_pressure_k_sum(k1, k2, f1, f2, n1, n2, xi)

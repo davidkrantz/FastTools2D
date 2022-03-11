@@ -59,7 +59,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             particle_offsets_src,box_offsets_src,nsources_in_box,
             particle_offsets_tar,box_offsets_tar,ntargets_in_box);
     
-    
     /*16-byte aligned arrays. Required to be compatible with SSE commands. FF*/
     double* psrc_a = static_cast<double*>(_mm_mxMalloc (2*Nsrc*sizeof(double), 16));
     double* ptar_a = static_cast<double*>(_mm_mxMalloc (2*Ntar*sizeof(double), 16));
@@ -111,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 
                 //compute r dot f
                 double rdotf = x1 * fs[2*k] + x2 * fs[2*k+1];
-                pressure[j] -= rdotf * exp(-xi*xi * r2)/r2;
+                pressure[j] += rdotf * exp(-xi*xi * r2)/r2;
             }
         }
         
@@ -144,7 +143,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                         if(r2 < cutoffsq) {
                             
                             double rdotf = x1 * fs[2*idx] + x2 * fs[2*idx+1];                          
-                            pressure[tidx + k] -= rdotf * exp(-xi*xi * r2)/r2;
+                            pressure[tidx + k] += rdotf * exp(-xi*xi * r2)/r2;
                         }
                     }
                 }

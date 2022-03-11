@@ -28,12 +28,10 @@ f2 = 10*rand(Nsrc,1);
 n1 = rand(Nsrc,1);
 n2 = sqrt(1 - n1.^2);
 
-% Source and target loccations
+% Source and target locations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
 
-% xtar = xsrc;
-% ytar = ysrc;
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
 

@@ -1,4 +1,4 @@
-function [p,  pr, pk, xi] = StokesDLP_pressure_ewald_2p(xsrc, ysrc,...
+function [p, pr, pk, xi] = StokesDLP_pressure_ewald_2p(xsrc, ysrc,...
                     xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Spectral Ewald evaluation of the doubly-periodic pressure of the
@@ -64,10 +64,11 @@ end
 zsrc = xsrc + 1i*ysrc;
 ztar = xtar + 1i*ytar;
 
-srcEqualsTar = 0;
-if (length(zsrc) == length(ztar) && norm(xsrc - xtar) < 1e-16)
-    srcEqualsTar = 1;
-end
+% Flag target indices that are source points
+I = ismember(zsrc, ztar);
+c = 1:length(zsrc);
+equal_idx = c(I);
+
 %% Fix for matlab 2018/2019, not sure why this is necessary, but it seems 
 % to work. 
 %
@@ -97,13 +98,13 @@ if verbose
 end
 
 %  Make sure the sources and targets are all inside the box.
-xsrc_ref = mod(xsrc+Lx/2,Lx)-Lx/2;
-xtar_ref = mod(xtar+Lx/2,Lx)-Lx/2;
-ysrc_ref = mod(ysrc+Ly/2,Ly)-Ly/2;
-ytar_ref = mod(ytar+Ly/2,Ly)-Ly/2;
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 
-psrc = [xsrc_ref';ysrc_ref'];
-ptar = [xtar_ref';ytar_ref'];
+psrc = [xsrc';ysrc'];
+ptar = [xtar';ytar'];
 f = [f1';f2'];
 n = [n1';n2'];
 
@@ -152,23 +153,23 @@ end
 
 pk = mex_stokes_dlp_pressure_kspace(psrc,ptar,f,n,xi,eta,Mx,My,Lx,Ly,w,P);
 
+% Add on zero mode
+pk = pk + -(sum((n1.*f1 + n2.*f2))/(2*Lx*Ly));
+
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
 pself = 0;
-if srcEqualsTar
-   qsrc_c = f1 + 1i*f2;
-   nsrc_c = n1 + 1i*n2;
-   
-   pself = xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);   
+if ~isempty(equal_idx) > 0
+    qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
+    nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
+    
+    pself = xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);
 end
-%p = -2*(pr + pk + pself); 
-p = pr + pk + pself; 
 
-% Add on zero mode
-p = p - sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);
+p = pr + pk + pself;
 
 end
 

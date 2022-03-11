@@ -22,6 +22,12 @@ function pk = stokes_slp_pressure_kspace_ds(xsrc,ysrc,xtar,ytar,f1,f2,Lx,Ly,xi,k
 Nsrc = length(xsrc);
 Ntar = size(xtar,1);
 pk = zeros(1, Ntar);
+
+% Make sure the sources and targets are all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
  
 %Source points
 for n = 1:Nsrc  
@@ -59,6 +65,9 @@ end
 
 pk = real(pk)/(Lx*Ly);
 
+% Add on zero mode
+pk = pk + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+
 end
 
 function pk = stokeslet_pressure_k_sum(k1, k2, f1, f2, xi)
@@ -66,7 +75,7 @@ function pk = stokeslet_pressure_k_sum(k1, k2, f1, f2, xi)
     kdotf = k1*f1 + k2*f2;
     k = sqrt(k1^2 + k2^2);
     
-    pk = 1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
+    pk = -1i * kdotf *exp(-k^2/(4*xi*xi))/k^2;
 end
 
 
