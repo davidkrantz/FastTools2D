@@ -1,10 +1,4 @@
-#include "mex.h"
-#include <math.h>
-#include <omp.h>
-#include <string.h>
 #include "ewald_tools.h"
-
-#define pi 3.1415926535897932385
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
@@ -164,7 +158,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double k2 = 2.0*pi/Ly*k;
             double Ksq = k1*k1+k2*k2;
             
-            //double e = (1.0/Ksq+0.25/xi2)*exp(-0.25*(1-eta)/xi2*Ksq);
             double e = (1.0/Ksq+1/(4*xi2))*exp(-Ksq*(1-eta)/(4*xi2));
 
             double f1n1_re = Hhat1_re[ptr];
@@ -191,7 +184,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double k2 = 2.0*pi/Ly*(k-My/2+1);
             double Ksq = k1*k1+k2*k2;
             
-            //double e = (1.0/Ksq+0.25/xi2)*exp(-0.25*(1-eta)/xi2*Ksq);
             double e = (1.0/Ksq+1/(4*xi2))*exp(-Ksq*(1-eta)/(4*xi2));
 
             double f1n1_re = Hhat1_re[ptr];
@@ -202,7 +194,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double f2n1_im = Hhat3_im[ptr];
             double f2n2_re = Hhat4_re[ptr];
             double f2n2_im = Hhat4_im[ptr];
-            
+
             // f \dot (k^\perp(k \dot n))
             double t1_re = k1*k2*f1n1_re+k2*k2*f1n2_re-(k1*k1*f2n1_re+k1*k2*f2n2_re);
             double t1_im = k1*k2*f1n1_im+k2*k2*f1n2_im-(k1*k1*f2n1_im+k1*k2*f2n2_im);
@@ -232,8 +224,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //The pointer to the real part. We don't need the imaginary part.
     double* Ht1 = mxGetPr(fft2rhs[0]);
     
-    if(Ht1 == NULL)
+    if(Ht1 == NULL) {
         Ht1 = new double[Mx*My];
+        memset(Ht1,0,Mx*My*sizeof(double));
+    }
     
     //Get rid of the Hhat arrays. They are no longer needed.
     mxDestroyArray(fft2lhs[0]);

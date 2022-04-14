@@ -1,8 +1,4 @@
-#include <math.h>
-#include <omp.h>
-#include <string.h>
 #include "ewald_tools.h"
-#define pi 3.1415926535897932385
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
@@ -111,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //possibly use fast gaussian gridding here too, to get rid of the
     //exponentials, but as this loop accounts for a few percent of the
     //total runtime, this hardly seems worth the extra work.
-#pragma omp parallel for
+//#pragma omp parallel for
     for(int j = 0;j<Mx;j++) {
         int ptr = j*My;
         
@@ -164,7 +160,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     //Remove the zero frequency term.
     Hhat1_re[0] = 0;
-    Hhat2_re[0] = 0;
+    Hhat1_im[0] = 0;
     
     //Get rid of the old H1 and H2 arrays. They are no longer needed.
     mxDestroyArray(fft2rhs[0]);
@@ -178,8 +174,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     //The pointer to the real part. We don't need the imaginary part.
     double* Ht1 = mxGetPr(fft2rhs[0]);
     
-    if(Ht1 == NULL)
+    if(Ht1 == NULL) {
         Ht1 = new double[Mx*My];
+        memset(Ht1,0,Mx*My*sizeof(double));
+    }
 
     //Get rid of the Hhat arrays. They are no longer needed.
     mxDestroyArray(fft2lhs[0]);

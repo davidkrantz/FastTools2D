@@ -100,13 +100,13 @@ if verbose
 end
 
 %  Make sure the sources and targets are all inside the box.
-xsrc_ref = mod(xsrc+Lx/2,Lx)-Lx/2;
-xtar_ref = mod(xtar+Lx/2,Lx)-Lx/2;
-ysrc_ref = mod(ysrc+Ly/2,Ly)-Ly/2;
-ytar_ref = mod(ytar+Ly/2,Ly)-Ly/2;
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 
-psrc = [xsrc_ref';ysrc_ref'];
-ptar = [xtar_ref';ytar_ref'];
+psrc = [xsrc';ysrc'];
+ptar = [xtar';ytar'];
 f = [f1';f2'];
 n = [n1';n2'];
 

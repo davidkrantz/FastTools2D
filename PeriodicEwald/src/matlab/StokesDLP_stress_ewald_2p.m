@@ -101,14 +101,14 @@ if verbose
     fprintf("Points per box: %d\n", Nb);
 end
 
-% Make sure the sources and targets are all inside the box.
-xsrc_ref = mod(xsrc+Lx/2,Lx)-Lx/2;
-xtar_ref = mod(xtar+Lx/2,Lx)-Lx/2;
-ysrc_ref = mod(ysrc+Ly/2,Ly)-Ly/2;
-ytar_ref = mod(ytar+Ly/2,Ly)-Ly/2;
+%  Make sure the sources and targets are all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 
-psrc = [xsrc_ref';ysrc_ref'];
-ptar = [xtar_ref';ytar_ref'];
+psrc = [xsrc';ysrc'];
+ptar = [xtar';ytar'];
 f = [f1';f2'];
 n = [n1';n2'];
 
@@ -162,16 +162,21 @@ end
 sigmak_tmp = mex_stokes_dlp_stress_kspace(psrc,ptar,xi,eta,f,n,Mx,My,Lx,Ly,w,P);
 
 sigmak = zeros(2,length(xtar));
-sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(2,:).*b2';
-sigmak(2,:) = sigmak_tmp(3,:).*b1' + sigmak_tmp(4,:).*b2';
+sigmak(1,:) = sigmak_tmp(1,:).*b1' + sigmak_tmp(3,:).*b2';
+sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
+
+% add on zero mode (from pressure)
+zero_mode = sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);  % zero mode is zero, atleast for the pipe flow
+sigmak = sigmak + zero_mode;
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
+sigma = sigmar + sigmak;
+
 % add on self-contribution
-sigmaself = 0;
 if ~isempty(equal_idx) > 0
     qsrc_c = f1(equal_idx) + 1i*f2(equal_idx);
     nsrc_c = n1(equal_idx) + 1i*n2(equal_idx);
@@ -183,18 +188,12 @@ if ~isempty(equal_idx) > 0
         btar_c.*real(qsrc_c.*conj(nsrc_c)))/(2*pi);
 
     % pressure
-    pself = xi^2*real(qsrc_c.*conj(nsrc_c))/(2*pi);
+    pself = xi^2*btar_c.*real(qsrc_c.*conj(nsrc_c))/(2*pi);
     
     % stress
-    sigmaself = -[pself'; pself'] + 2*[real(ugradself)'; imag(ugradself)'];
+    sigmaself = -[pself'; zeros(1,length(xtar))] + 2*[real(ugradself)'; imag(ugradself)'];
+    sigma = sigma + sigmaself;
 end
-
-%sigma = sigmar + sigmak;
-sigma = sigmar + sigmak + sigmaself;
-
-% add on zero mode (from pressure)
-zero_mode = sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);  % zero mode is zero, atleast for the pipe flow
-sigma = sigma - zero_mode;
 
 sigma1 = sigma(1,:)';
 sigma2 = sigma(2,:)';

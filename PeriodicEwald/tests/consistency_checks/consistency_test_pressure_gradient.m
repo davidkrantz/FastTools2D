@@ -8,25 +8,33 @@ clc
 
 initewald
 
+% Test parameters
+test_self = 1;
+Nsrc = 100;
+Ntar = 100;
+Lx_value = 1;
+Ly_value = 2;
+
 %% Set up data
-Nsrc = 10000;
-Ntar = 10000;
-
-Lx = 2*pi;
-Ly = 2*pi;
-
-xtar = Lx*rand(Ntar,1);
-ytar = Ly*rand(Ntar,1);
+% Length of periodic box
+Lx = Lx_value;
+Ly = Ly_value;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
 f2 = 10*rand(Nsrc,1);
 
-% Source and target loccations
+% Source and target locations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
-xtar = xsrc;
-ytar = ysrc;
+
+if test_self
+    xtar = xsrc;
+    ytar = ysrc;
+else
+    xtar = Lx*rand(Ntar,1);
+    ytar = Ly*rand(Ntar,1);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Single-layer potential 
@@ -87,19 +95,30 @@ fprintf('\nMaximum error from creating periodic replicate for SLP: %.5e\n',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Double-layer potential 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%% Set up data
+% Length of periodic box
+Lx = Lx_value;
+Ly = Ly_value;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
 f2 = 10*rand(Nsrc,1);
+
+% Normal vector at source points
 n1 = rand(Nsrc,1);
 n2 = sqrt(1 - n1.^2);
 
-% Source and target loccations
+% Source and target locations
 xsrc = Lx*rand(Nsrc,1);
 ysrc = Ly*rand(Nsrc,1);
-xtar = xsrc;
-ytar = ysrc;
+
+if test_self
+    xtar = xsrc;
+    ytar = ysrc;
+else
+    xtar = Lx*rand(Ntar,1);
+    ytar = Ly*rand(Ntar,1);
+end
 
 fprintf("\n*********************************************************\n");
 fprintf('Checking consistency of double-layer potential...\n');

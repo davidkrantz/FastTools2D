@@ -79,7 +79,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         v1[2*i] = f[2*i]*n[2*i];          //f1 * n1
         v1[2*i + 1] = f[2*i+1]*n[2*i];    //f2 * n1
         v2[2*i] = f[2*i]*n[2*i+1];        //f1 * n2
-        v2[2*i + 1] = f[2*i+1]*n[2*i+1];  //n2 * n2
+        v2[2*i + 1] = f[2*i+1]*n[2*i+1];  //f2 * n2
     }
     
     //This is the precomputable part of the fast Gaussian gridding.
@@ -131,7 +131,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     if(Hhat3_im == NULL) {
         Hhat3_im = new double[Mx*My];
-       mxSetPi(fft2lhs[2],Hhat3_im);
+        mxSetPi(fft2lhs[2],Hhat3_im);
     }
     
     if(Hhat4_im == NULL) {
@@ -168,14 +168,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double f2n1_im = Hhat3_im[ptr];
             double f2n2_re = Hhat4_re[ptr];
             double f2n2_im = Hhat4_im[ptr];
-            
+
             //j = 1, l = 1
             Hhat1_re[ptr] = e*((k1*k1*f1n1_re+k1*k2*f1n2_re+k2*k1*f2n1_re+k2*k2*f2n2_re)/Ksq
                 -mu*(1/Ksq+0.25/(xi*xi))*(2*k1*k1*(f1n1_re+f2n2_re)+k1*(k1*f1n1_re+k2*f1n2_re)
                 +k1*(k1*f1n1_re+k2*f2n1_re)+k1*(k1*f1n1_re+k2*f1n2_re)+k1*(k1*f1n1_re+k2*f2n1_re)
                 -4*k1*k1*(k1*k1*f1n1_re+k1*k2*f1n2_re+k2*k1*f2n1_re+k2*k2*f2n2_re)/Ksq));
             Hhat1_im[ptr] = e*((k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq
-                -mu*(1/Ksq+0.25/(xi*xi))*(2*k1*k2*(f1n1_im+f2n2_im)+k1*(k1*f1n1_im+k2*f1n2_im)
+                -mu*(1/Ksq+0.25/(xi*xi))*(2*k1*k1*(f1n1_im+f2n2_im)+k1*(k1*f1n1_im+k2*f1n2_im)
                 +k1*(k1*f1n1_im+k2*f2n1_im)+k1*(k1*f1n1_im+k2*f1n2_im)+k1*(k1*f1n1_im+k2*f2n1_im)
                 -4*k1*k1*(k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq));
             
@@ -227,10 +227,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 +k1*(k1*f1n1_re+k2*f2n1_re)+k1*(k1*f1n1_re+k2*f1n2_re)+k1*(k1*f1n1_re+k2*f2n1_re)
                 -4*k1*k1*(k1*k1*f1n1_re+k1*k2*f1n2_re+k2*k1*f2n1_re+k2*k2*f2n2_re)/Ksq));
             Hhat1_im[ptr] = e*((k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq
-                -mu*(1/Ksq+0.25/(xi*xi))*(2*k1*k2*(f1n1_im+f2n2_im)+k1*(k1*f1n1_im+k2*f1n2_im)
+                -mu*(1/Ksq+0.25/(xi*xi))*(2*k1*k1*(f1n1_im+f2n2_im)+k1*(k1*f1n1_im+k2*f1n2_im)
                 +k1*(k1*f1n1_im+k2*f2n1_im)+k1*(k1*f1n1_im+k2*f1n2_im)+k1*(k1*f1n1_im+k2*f2n1_im)
                 -4*k1*k1*(k1*k1*f1n1_im+k1*k2*f1n2_im+k2*k1*f2n1_im+k2*k2*f2n2_im)/Ksq));
-            
+
             //j = 2, l = 1
             Hhat2_re[ptr] = -e*mu*(1/Ksq+0.25/(xi*xi))*(2*k2*k1*(f1n1_re+f2n2_re)+k2*(k1*f1n1_re+k2*f1n2_re)
                 +k2*(k1*f1n1_re+k2*f2n1_re)+k1*(k1*f2n1_re+k2*f2n2_re)+k1*(k1*f1n2_re+k2*f2n2_re)
@@ -304,7 +304,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
     if(Ht4 == NULL) {
         Ht4 = new double[Mx*My];
-        memset(Ht3,0,Mx*My*sizeof(double));
+        memset(Ht4,0,Mx*My*sizeof(double));
     }
     
     //Get rid of the Hhat arrays. They are no longer needed.

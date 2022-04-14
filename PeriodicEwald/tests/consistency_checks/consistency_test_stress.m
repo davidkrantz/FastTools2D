@@ -10,10 +10,10 @@ initewald
 
 % Test parameters
 test_self = 1;
-Nsrc = 8;
-Ntar = 8;
+Nsrc = 10000;
+Ntar = 10000;
 Lx_value = 1;
-Ly_value = 1;
+Ly_value = 2;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Single-layer potential 
@@ -56,15 +56,15 @@ end
 
 Nb = [3, 9, 27];
 
-u = zeros(Ntar, length(Nb));
+sigma = zeros(Ntar, length(Nb));
 
 for j = 1:length(Nb)
     tic
-    [u1, u2] = StokesSLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
+    [sigma1, sigma2] = StokesSLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
                 b1, b2, Lx, Ly, 'Nb', Nb(j), 'verbose', 1);
     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(j), toc);
     
-    u(:,j) = u1 + 1i*u2;
+    sigma(:,j) = sigma1 + 1i*sigma2;
 end
 
 %% Check that using a different number of bins doesn't affect solution
@@ -72,7 +72,7 @@ end
 E = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E(i,j) = max(abs(u(:,i) - u(:,j))./abs(u(:,i)));
+        E(i,j) = max(abs(sigma(:,i) - sigma(:,j))./abs(sigma(:,i)));
     end
 end
 
@@ -81,10 +81,20 @@ fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',...
 
 %% Check that replicating reference cell doesn't affect solution
 
-[u1, u2] = StokesSLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
+[sigma1, sigma2] = StokesSLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
             b1, b2, Lx, Ly);
 
-u1 = u1 + 1i*u2;
+sigma1 = sigma1 + 1i*sigma2;
+
+% Subtract off zero mode, but first make sure the sources and targets are
+% all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
+sigma1 = sigma1 - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+sigma1 = sigma1 - 1i*sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
 f1 = [f1; f1];
@@ -92,12 +102,22 @@ f2 = [f2; f2];
 
 Lx = 2*Lx;
 
-[u3, u4] = StokesSLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
+[sigma3, sigma4] = StokesSLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, f1, f2, ...
             b1, b2, Lx, Ly);
-u2 = u3 + 1i*u4;
+
+sigma2 = sigma3 + 1i*sigma4;
+
+% Subtract off zero mode, but first make sure the sources and targets are
+% all inside the box.
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
+sigma2 = sigma2 - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+sigma2 = sigma2 - 1i*sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
 fprintf('\nMaximum error from creating periodic replicate for SLP: %.5e\n',...
-    max(abs(u1 - u2)./abs(u1)));
+    max(abs(sigma1 - sigma2)./abs(sigma1)));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Double-layer potential 
@@ -134,22 +154,22 @@ end
 
 Nb = [3, 9, 27];
 
-u = zeros(Ntar, length(Nb));
+sigma = zeros(Ntar, length(Nb));
 
 for i = 1:length(Nb)
     tic
-    [u1, u2] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2,...
+    [sigma1, sigma2] = StokesDLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2,...
                 b1, b2, Lx, Ly,'Nb', Nb(i), 'verbose', 1);
     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(i), toc);
     
-    u(:,i) = u1 + 1i*u2;
+    sigma(:,i) = sigma1 + 1i*sigma2;
 end
 
 %% Check that using a different number of bins doesn't affect solution
 E = zeros(length(Nb), length(Nb));
 for i = 1:length(Nb)
     for j = 1:length(Nb)
-        E(i,j) = max(abs(u(:,i) - u(:,j))./abs(u(:,i)));
+        E(i,j) = max(abs(sigma(:,i) - sigma(:,j))./abs(sigma(:,i)));
     end
 end
 
@@ -157,9 +177,9 @@ fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
     max(max(E)));
 
 %% Check that replicating boxes doesn't affect solution.
-[u1, u2] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
+[sigma1, sigma2] = StokesDLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
 
-u1 = u1 + 1i*u2;
+sigma1 = sigma1 + 1i*sigma2;
 
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
@@ -170,9 +190,9 @@ n2 = [n2; n2];
 
 Lx = 2*Lx;
 
-[u3, u4] = StokesDLP_gradient_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
+[sigma3, sigma4] = StokesDLP_stress_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, b1, b2, Lx, Ly);
 
-u2 = u3 + 1i*u4;
+sigma2 = sigma3 + 1i*sigma4;
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
-    max(abs(u1 - u2)./abs(u1)));
+    max(abs(sigma1 - sigma2)./abs(sigma1)));

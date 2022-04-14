@@ -15,10 +15,10 @@ tol = 1e-16;
 kinf = 70;
 
 Nsrc = 10;
-Ntar = 100;
+Ntar = 10;
 
 Lx = 1;
-Ly = 2;
+Ly = 1;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);

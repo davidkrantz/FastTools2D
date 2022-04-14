@@ -24,8 +24,8 @@ matlab_add_mex(
 )
 
 matlab_add_mex(
-	NAME mex_stokes_slp_gradient_kspace
-	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_gradient_kspace.cpp
+	NAME mex_stokes_slp_gradient_kspace_old
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_gradient_kspace_old.cpp
 )
 
 matlab_add_mex(
@@ -56,6 +56,16 @@ matlab_add_mex(
 matlab_add_mex(
 	NAME mex_stokes_slp_stress_real
 	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_stress_real.cpp
+)
+
+matlab_add_mex(
+	NAME mex_stokes_slp_stress_kspace_old
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_stress_kspace_old.cpp
+)
+
+matlab_add_mex(
+	NAME mex_stokes_slp_gradient_kspace
+	SRC ${CMAKE_SOURCE_DIR}/mex/common/ewald_tools.cpp mex_stokes_slp_gradient_kspace.cpp
 )
 
 matlab_add_mex(

@@ -125,7 +125,7 @@ end
 pk = mex_stokes_slp_pressure_kspace(psrc,ptar,f,xi,eta,Mx,My,Lx,Ly,w,P);
 
 % Add on zero mode
-pk = pk + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+pk = pk + -sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);

@@ -66,7 +66,7 @@ end
 pk = real(pk)/(Lx*Ly);
 
 % Add on zero mode
-pk = pk + sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+pk = pk + -sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
 end
 

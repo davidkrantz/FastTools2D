@@ -12,13 +12,13 @@ initewald
 % Ewald tolerance
 tol = 1e-16;
 % k trunctation for direct summation
-kinf = 100;
+kinf = 70;
 
 Nsrc = 20;
 Ntar = 20;
 
 Lx = 1;
-Ly = 2;
+Ly = 1;
 
 % Two components of the density function
 f1 = 10*rand(Nsrc,1);
@@ -34,6 +34,14 @@ ysrc = Ly*rand(Nsrc,1);
 
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
+
+% Make sure the sources and targets are all inside the box. Needed for
+% correct comparison between direct and Ewald Fourier sum due to the
+% non-zero zero-mode
+xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
+xtar = mod(xtar+Lx/2,Lx)-Lx/2;
+ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
+ytar = mod(ytar+Ly/2,Ly)-Ly/2;
 
 %% Check single-layer potential
 fprintf("*********************************************************\n");
@@ -82,4 +90,3 @@ uk_direct = stokes_dlp_kspace_ds(xsrc, ysrc, xtar, ytar, n1, n2,...
                         f1, f2, Lx, Ly, xi, kinf);
  
 fprintf('MAXIMUM ERROR: %.5e\n',max(max(abs(uk_direct - uk_ewald))));
-

@@ -67,6 +67,19 @@ xi2 = xi*xi;
 
 omega_real = exp(-xi2*rSq)*((1+xi2*rSq)*rdot/(rSq*rSq) + xi2*xi2*(ndot+fdot))/pi;
 
+% April 2022 (gives exactly the same as above)
+% rdotf = r1*f1 + r2*f2;
+% rdotn = r1*n1 + r2*n2;
+% 
+% ndotrperp = n1*r2*rdotf + n2*(-r1)*rdotf;
+% fdotrperp = f1*r2*rdotn + f2*(-r1)*rdotn;
+% 
+% rdotnperp = r1*n2*rdotf + r2*(-n1)*rdotf;
+% rdotfperp = r1*f2*rdotn + r2*(-f1)*rdotn;
+% 
+% omega_real_new = -exp(-xi2*rSq)*((1+xi2*rSq)*(ndotrperp+fdotrperp)/(rSq*rSq) + ...
+%     xi2*xi2*(rdotnperp+rdotfperp))/pi;
+
 end
 
 

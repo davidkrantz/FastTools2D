@@ -139,6 +139,10 @@ if verbose
     tic
 end
 
+% old mex that does not work
+% uk_tmp = mex_stokes_slp_gradient_kspace_old(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P)
+
+% new mex that works
 uk_tmp = mex_stokes_slp_gradient_kspace(psrc,ptar,xi,eta,f,Mx,My,Lx,Ly,w,P);
 
 uk = zeros(2,length(xtar));

@@ -18,7 +18,7 @@ function ugrad_k = stokes_slp_gradient_kspace_ds(xsrc,ysrc,xtar,ytar,f1,f2,b1,b2
 %       xi, ewald parameter
 %       kinf, truncation length (integer)
 % Output:
-%       pk, pressure as 1xN matrix
+%       ugrad_k, velocity gradient as 1xN matrix
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Nsrc = length(xsrc);

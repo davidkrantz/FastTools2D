@@ -63,10 +63,8 @@ end
 
 sigmak = real(sigmak) / (Lx*Ly);
 
-% check if we need to add something similar
-% Add on zero mode
-% uk(1,:) = uk(1,:) + sum((f1.*n1 + f2.*n2).*xsrc) / (Lx*Ly);
-% uk(2,:) = uk(2,:) + sum((f1.*n1 + f2.*n2).*ysrc) / (Lx*Ly);
+% add on zero mode
+sigmak = sigmak + sum((n1.*f1 + n2.*f2))/(2*Lx*Ly);
 
 end
 

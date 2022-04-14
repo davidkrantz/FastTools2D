@@ -77,7 +77,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         v1[2*i] = f[2*i]*n[2*i];          //f1 * n1
         v1[2*i + 1] = f[2*i+1]*n[2*i];    //f2 * n1
         v2[2*i] = f[2*i]*n[2*i+1];        //f1 * n2
-        v2[2*i + 1] = f[2*i+1]*n[2*i+1];  //n2 * n2
+        v2[2*i + 1] = f[2*i+1]*n[2*i+1];  //f2 * n2
     }
     
     //This is the precomputable part of the fast Gaussian gridding.
@@ -129,7 +129,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
     if(Hhat3_im == NULL) {
         Hhat3_im = new double[Mx*My];
-       mxSetPi(fft2lhs[2],Hhat3_im);
+        mxSetPi(fft2lhs[2],Hhat3_im);
     }
     
     if(Hhat4_im == NULL) {
@@ -309,7 +309,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     }
     if(Ht4 == NULL) {
         Ht4 = new double[Mx*My];
-        memset(Ht3,0,Mx*My*sizeof(double));
+        memset(Ht4,0,Mx*My*sizeof(double));
     }
     
     //Get rid of the Hhat arrays. They are no longer needed.

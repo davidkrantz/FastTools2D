@@ -60,6 +60,7 @@ for n = 1:Nsrc
 end
 
 sigmak = real(sigmak) / (Lx*Ly);
+
 end
 
 function sigmak = stokes_slp_stress_k_sum(k1, k2, f1, f2, b1, b2, xi)

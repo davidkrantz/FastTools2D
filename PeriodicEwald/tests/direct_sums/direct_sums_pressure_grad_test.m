@@ -36,7 +36,7 @@ ysrc = Ly*rand(Nsrc,1);
 % ytar = ysrc;
 xtar = Lx*rand(Ntar,1);
 ytar = Ly*rand(Ntar,1);
-% 
+
 % %% Check single-layer potential
 fprintf("*********************************************************\n");
 fprintf('TESTING DIRECT SUMS FOR STOKES SINGLE-LAYER POTENTIAL\n');

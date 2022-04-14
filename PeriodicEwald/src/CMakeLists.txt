@@ -37,8 +37,8 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/")
 
 # Assuming gcc for now
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -O3  -fopenmp -msse3 -falign-loops=16 -DMEX_DOUBLE_HANDLE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -O3 -fopenmp -falign-loops=16 -msse4.1 -DMEX_DOUBLE_HANDLE")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -O0  -fopenmp -msse3 -falign-loops=16 -DMEX_DOUBLE_HANDLE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -O0 -fopenmp -falign-loops=16 -msse4.1 -DMEX_DOUBLE_HANDLE")
 
 include_directories(
   ${Matlab_INCLUDE_DIRS}

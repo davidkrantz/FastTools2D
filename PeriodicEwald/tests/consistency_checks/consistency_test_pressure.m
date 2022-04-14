@@ -9,11 +9,11 @@ clc
 initewald
 
 % Test parameters
-test_self = 0;
-Nsrc = 10000;
-Ntar = 10000;
-Lx_value = 2*pi;
-Ly_value = 2*pi;
+test_self = 1;
+Nsrc = 8;
+Ntar = 8;
+Lx_value = 1;
+Ly_value = 1;
 
 %% Set up data
 % Length of periodic box
@@ -68,7 +68,7 @@ end
 E1 = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E1(i,j) = max(abs(p(:,i) - p(:,j)));
+        E1(i,j) = max(abs(p(:,i) - p(:,j))./abs(p(:,i)));
     end
 end
 fprintf('\nMaximum error from changing number of bins for SLP: %.5e\n',...
@@ -86,7 +86,7 @@ xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 xtar = mod(xtar+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 ytar = mod(ytar+Ly/2,Ly)-Ly/2;
-p1 = p1 - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+p1 = p1 - -sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
 xsrc = [xsrc; xsrc + Lx];
 ysrc = [ysrc; ysrc];
@@ -103,10 +103,10 @@ xsrc = mod(xsrc+Lx/2,Lx)-Lx/2;
 xtar = mod(xtar+Lx/2,Lx)-Lx/2;
 ysrc = mod(ysrc+Ly/2,Ly)-Ly/2;
 ytar = mod(ytar+Ly/2,Ly)-Ly/2;
-p2 = p2 - sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+p2 = p2 - -sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
 
-fprintf('\nMaximum error from creating periodic replicate for SLP: %.5e\n',...
-    max(abs(p1 - p2)));
+fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
+    max(abs(p1 - p2)./abs(p1)));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Double-layer potential 
@@ -148,7 +148,7 @@ xi = zeros(length(Nb),1);
 
 for j = 1:length(Nb)
     tic
-    [p_tmp,~,~,xi_tmp] = StokesDLP_pressure_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly,...
+    p_tmp = StokesDLP_pressure_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly,...
                 'Nb', Nb(j), 'verbose', 1);
     fprintf('Nb %d: Spectral Ewald (mex) computed in %.5f s\n', Nb(j), toc);
     
@@ -160,7 +160,7 @@ end
 E1 = zeros(length(Nb), length(Nb));
 for j = 1:length(Nb)
     for i = 1:length(Nb)
-        E1(i,j) = max(abs(p(:,i) - p(:,j)));
+        E1(i,j) = max(abs(p(:,i) - p(:,j))./abs(p(:,i)));
     end
 end
 fprintf('\nMaximum error from changing number of bins for DLP: %.5e\n',...
@@ -182,4 +182,4 @@ Lx = 2*Lx;
 p2 = StokesDLP_pressure_ewald_2p(xsrc, ysrc, xtar, ytar, n1, n2, f1, f2, Lx, Ly);
 
 fprintf('\nMaximum error from creating periodic replicate for DLP: %.5e\n',...
-    max(abs(p1 - p2)));
+    max(abs(p1 - p2)./abs(p1)));
