@@ -142,7 +142,7 @@ end
 omega = omegar + omegak;
 
 % adding this zero mode yields the correct identity
-%omega = omega - sum((f1.*ysrc - f2.*xsrc)) / (2*Lx*Ly);
+omega = omega - sum((f1.*ysrc - f2.*xsrc)) / (2*Lx*Ly);
 
 end
 

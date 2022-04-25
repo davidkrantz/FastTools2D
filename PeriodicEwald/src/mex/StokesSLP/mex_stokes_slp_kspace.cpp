@@ -180,10 +180,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     double* Ht1 = mxGetPr(fft2rhs[0]);
     double* Ht2 = mxGetPr(fft2rhs[1]);
     
-    if(Ht1 == NULL)
+    if(Ht1 == NULL) {
         Ht1 = new double[Mx*My];
-    if(Ht2 == NULL)
+        memset(Ht1,0,Mx*My*sizeof(double));
+    }
+    if(Ht2 == NULL) {
         Ht2 = new double[Mx*My];
+        memset(Ht2,0,Mx*My*sizeof(double));
+    }
     
     //Get rid of the Hhat1 and Hhat2 arrays. They are no longer needed.
     mxDestroyArray(fft2lhs[0]);
