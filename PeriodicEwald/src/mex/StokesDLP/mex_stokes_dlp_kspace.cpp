@@ -133,17 +133,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         Hhat2_im = (double*) mxCalloc(cs,sizeof(double));
         mxSetPi(fft2lhs[1],Hhat2_im);
     }
-    
     if(Hhat3_im == NULL) {
         Hhat3_im = new double[Mx*My];
-        memset(Hhat3_im,0,Mx*My*sizeof(double));
-        alloc3 = 1;
+        mxSetPi(fft2lhs[2],Hhat3_im);
     }
-    
     if(Hhat4_im == NULL) {
         Hhat4_im = new double[Mx*My];
-        memset(Hhat4_im,0,Mx*My*sizeof(double));
-        alloc4 = 1;
+        mxSetPi(fft2lhs[3],Hhat4_im);;
     }
     
     //Apply filter in the frequency domain. This is a completely
@@ -235,18 +231,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     Hhat1_im[0] = 0;
     Hhat2_im[0] = 0;
     
-    if(alloc3 != 0)
-        delete Hhat3_im;
-    if(alloc4 != 0)
-        delete Hhat4_im;
-    
     //Get rid of the old H arrays. They are no longer needed.
     mxDestroyArray(fft2rhs[0]);
     mxDestroyArray(fft2rhs[1]);
     mxDestroyArray(fft2rhs[2]);
     mxDestroyArray(fft2rhs[3]);
-    mxDestroyArray(fft2lhs[2]);
-    mxDestroyArray(fft2lhs[3]);
     
     //Do the inverse 2D FFTs. We use Matlab's inbuilt functions again.
     mexCallMATLAB(1,&fft2rhs[0],1,&fft2lhs[0],"ifft2");

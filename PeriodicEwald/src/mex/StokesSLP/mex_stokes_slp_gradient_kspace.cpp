@@ -118,12 +118,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         Hhat2_im = (double*) mxCalloc(cs,sizeof(double));
         mxSetPi(fft2lhs[1],Hhat2_im);
     }
-    
     if(Hhat3_im == NULL) {
         Hhat3_im = new double[Mx*My];
-       mxSetPi(fft2lhs[2],Hhat3_im);
+        mxSetPi(fft2lhs[2],Hhat3_im);
     }
-    
     if(Hhat4_im == NULL) {
         Hhat4_im = new double[Mx*My];
         mxSetPi(fft2lhs[3],Hhat4_im);
