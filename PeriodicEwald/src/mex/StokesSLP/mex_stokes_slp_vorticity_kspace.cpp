@@ -127,7 +127,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             double k2 = 2.0*pi/Ly*k;
             double Ksq = k1*k1+k2*k2;
-            double e = (1.0/Ksq+0.25/(xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
+            double e = (1.0/Ksq)*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
             
             double fdotkperp_re = f1_re*k2 - f2_re*k1;
             double fdotkperp_im = f1_im*k2 - f2_im*k1;
@@ -135,6 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             // multiplication by -i
             Hhat1_re[ptr] = fdotkperp_im*e;
             Hhat1_im[ptr] = -fdotkperp_re*e;
+            
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
             
@@ -147,7 +148,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             
             double k2 = 2.0*pi/Ly*(k-My/2+1);
             double Ksq = k1*k1+k2*k2;
-            double e = (1.0/Ksq+0.25/(xi*xi))*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
+            double e = (1.0/Ksq)*exp(-0.25*(1-eta)/(xi*xi)*Ksq);
             
             double fdotkperp_re = f1_re*k2 - f2_re*k1;
             double fdotkperp_im = f1_im*k2 - f2_im*k1;
@@ -155,6 +156,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             // multiplication by -i
             Hhat1_re[ptr] = fdotkperp_im*e;
             Hhat1_im[ptr] = -fdotkperp_re*e;
+            
         }
     }
     

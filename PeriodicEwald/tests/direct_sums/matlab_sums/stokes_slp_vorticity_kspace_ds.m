@@ -66,5 +66,6 @@ fdotkperp = f1*k2 - f2*k1;
 
 kSq = k1^2+k2^2;
 
-omega_k = -1i*fdotkperp*(1/kSq+1/(4*xi*xi))*exp(-kSq/(4*xi*xi)); 
+omega_k = -1i*(fdotkperp/kSq)*exp(-kSq/(4*xi*xi));
+
 end

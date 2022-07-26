@@ -117,7 +117,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 double e2 = exp(-xi2*rSq);
                 double fdotrperp = f1*r2 - f2*r1;
 
-                omega[j] += e2*(1/rSq-xi2)*fdotrperp;
+                omega[j] += (e2/rSq)*fdotrperp;
             }
         }
         
@@ -155,7 +155,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             double e2 = exp(-xi2*rSq);
                             double fdotrperp = f1*r2 - f2*r1;
 
-                            omega[tidx+k] += e2*(1/rSq-xi2)*fdotrperp;
+                            omega[tidx+k] += (e2/rSq)*fdotrperp;
                         }
                     }
                 }

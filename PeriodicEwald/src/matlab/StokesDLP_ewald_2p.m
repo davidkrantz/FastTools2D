@@ -1,7 +1,7 @@
 function [u1, u2, ur, uk, xi] = StokesDLP_ewald_2p(xsrc, ysrc,...
                     xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-% Spectral Ewald evaluation of the doubly-periodic  double-layer potential.
+% Spectral Ewald evaluation of the doubly-periodic double-layer potential.
 %
 % Input:
 %       xsrc, x component of source points

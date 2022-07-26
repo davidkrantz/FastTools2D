@@ -165,7 +165,7 @@ sigmak(2,:) = sigmak_tmp(2,:).*b1' + sigmak_tmp(4,:).*b2';
 sigma = sigmar + sigmak;
 
 % add on zero mode (from pressure)
-zero_mode = sum((f1.*xsrc + f2.*ysrc)) / (2*Lx*Ly);
+zero_mode = [sum(xsrc.*(f1+f2)); sum(ysrc.*(f1+f2))] / (2*Lx*Ly);
 sigma = sigma + zero_mode;
 
 sigma1 = sigma(1,:)';

@@ -58,6 +58,6 @@ fdotrperp = f1*r2 - f2*r1;
 rSq = r1^2 + r2^2;
 xi2 = xi*xi;
 
-omega_real = exp(-xi2*rSq)*(1/rSq-xi2)*fdotrperp/(2*pi);
+omega_real = (exp(-xi2*rSq)/rSq)*fdotrperp/(2*pi);
 
 end

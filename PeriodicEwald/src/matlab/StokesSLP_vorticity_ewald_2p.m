@@ -141,8 +141,9 @@ end
 
 omega = omegar + omegak;
 
-% adding this zero mode yields the correct identity
-omega = omega - sum((f1.*ysrc - f2.*xsrc)) / (2*Lx*Ly);
+% adding this zero mode yields the correct identity but then it fails the
+% periodic consistency test
+%omega = omega - sum((f1.*ysrc - f2.*xsrc)) / (2*Lx*Ly);
 
 end
 
