@@ -50,7 +50,7 @@ for n=1:Nsrc
     end
 end
 
-pgrad_real = -pgrad_real / (2*pi);
+pgrad_real = pgrad_real / (2*pi);
 
 end
 

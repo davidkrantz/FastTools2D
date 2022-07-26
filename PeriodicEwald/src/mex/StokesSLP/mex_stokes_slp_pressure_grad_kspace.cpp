@@ -120,11 +120,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double kdotq_re = k1 * Hhat1_re[ptr] + k2 * Hhat2_re[ptr];
             double kdotq_im = k1 * Hhat1_im[ptr] + k2 * Hhat2_im[ptr];
             
-            Hhat1_re[ptr] = -k1*kdotq_re * e / Ksq;
-            Hhat1_im[ptr] = -k1*kdotq_im * e / Ksq; 
+            Hhat1_re[ptr] = k1*kdotq_re * e / Ksq;
+            Hhat1_im[ptr] = k1*kdotq_im * e / Ksq; 
             
-            Hhat2_re[ptr] = -k2*kdotq_re * e / Ksq;
-            Hhat2_im[ptr] = -k2*kdotq_im * e / Ksq;   
+            Hhat2_re[ptr] = k2*kdotq_re * e / Ksq;
+            Hhat2_im[ptr] = k2*kdotq_im * e / Ksq;   
         }
         for(int k = 0;k<My/2-1;k++,ptr++) {
             double k2 = 2.0*pi/Ly*(k-My/2+1);
@@ -136,11 +136,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             double kdotq_re = k1 * Hhat1_re[ptr] + k2 * Hhat2_re[ptr];
             double kdotq_im = k1 * Hhat1_im[ptr] + k2 * Hhat2_im[ptr];
             
-            Hhat1_re[ptr] = -k1*kdotq_re * e / Ksq;
-            Hhat1_im[ptr] = -k1*kdotq_im * e / Ksq; 
+            Hhat1_re[ptr] = k1*kdotq_re * e / Ksq;
+            Hhat1_im[ptr] = k1*kdotq_im * e / Ksq; 
             
-            Hhat2_re[ptr] = -k2*kdotq_re * e / Ksq;
-            Hhat2_im[ptr] = -k2*kdotq_im * e / Ksq; 
+            Hhat2_re[ptr] = k2*kdotq_re * e / Ksq;
+            Hhat2_im[ptr] = k2*kdotq_im * e / Ksq; 
         }
     }
     

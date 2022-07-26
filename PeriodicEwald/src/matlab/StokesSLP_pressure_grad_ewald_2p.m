@@ -150,10 +150,10 @@ end
 
 pself = 0;
 if ~isempty(equal_idx) > 0
-   pself = xi^2*f(:,equal_idx)/(2*pi);
+   pself = -xi^2*f(:,equal_idx)/(2*pi);
 end
 
-p = -(pr + pk + pself);
+p = pr + pk + pself;
 
 end
 

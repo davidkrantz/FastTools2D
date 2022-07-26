@@ -114,8 +114,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                 //compute r dot f
                 double rdotf = x1 * f1 + x2 * f2;
                 
-                pressure_grad[2*j] -= exp(-xi*xi * r2)*((f1 - 2*xi*xi*rdotf*x1)/r2 - 2*rdotf*x1/r2/r2);
-                pressure_grad[2*j+1] -= exp(-xi*xi * r2)*((f2 - 2*xi*xi*rdotf*x2)/r2 - 2*rdotf*x2/r2/r2);
+                pressure_grad[2*j] += exp(-xi*xi * r2)*((f1 - 2*xi*xi*rdotf*x1)/r2 - 2*rdotf*x1/r2/r2);
+                pressure_grad[2*j+1] += exp(-xi*xi * r2)*((f2 - 2*xi*xi*rdotf*x2)/r2 - 2*rdotf*x2/r2/r2);
             }
         }
         
@@ -152,8 +152,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                             double f1 = fs[2*idx];
                             double f2 = fs[2*idx+1];
                             double rdotf = x1 * f1 + x2 * f2;
-                            pressure_grad[2*(tidx+k)] -= exp(-xi*xi * r2)*((f1 - 2*xi*xi*rdotf*x1)/r2 - 2*rdotf*x1/r2/r2);
-                            pressure_grad[2*(tidx+k)+1] -= exp(-xi*xi * r2)*((f2 - 2*xi*xi*rdotf*x2)/r2 - 2*rdotf*x2/r2/r2);                            
+                            pressure_grad[2*(tidx+k)] += exp(-xi*xi * r2)*((f1 - 2*xi*xi*rdotf*x1)/r2 - 2*rdotf*x1/r2/r2);
+                            pressure_grad[2*(tidx+k)+1] += exp(-xi*xi * r2)*((f2 - 2*xi*xi*rdotf*x2)/r2 - 2*rdotf*x2/r2/r2);                            
                         }
                     }
                 }
