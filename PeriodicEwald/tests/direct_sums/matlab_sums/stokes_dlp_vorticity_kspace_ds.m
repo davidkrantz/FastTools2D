@@ -91,5 +91,9 @@ omega_k = (fdot+ndot)*(1/kSq+1/(4*xi*xi))*exp(-kSq/(4*xi*xi));
 % 
 % omega_k = -(t1+t2)*e;
 
+% sign difference from current implementation
+%nperpdotk = n2*k1 - n1*k2;
+%fperpdotk = f2*k1 - f1*k2;
+%omega_k_new = (nperpdotk*kdotf+fperpdotk*kdotn)*(1/kSq+1/(4*xi*xi))*exp(-kSq/(4*xi*xi));
 
 end
