@@ -1,4 +1,4 @@
-function [p,  pr, pk, xi] = StokesDLP_pressure_grad_ewald_2p(xsrc, ysrc,...
+function [dp, dpr, dpk, xi] = StokesDLP_pressure_grad_ewald_2p(xsrc, ysrc,...
                     xtar, ytar, n1, n2, f1, f2, Lx, Ly, varargin)
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Spectral Ewald evaluation of the doubly-periodic pressure of the
@@ -137,21 +137,21 @@ if verbose
     tic
 end
 
-pr = mex_stokes_dlp_pressure_grad_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
+dpr = mex_stokes_dlp_pressure_grad_real(psrc,ptar,f,n,xi,nside_x,nside_y,Lx,Ly);
 
 if verbose
     fprintf("TIME FOR REAL SUM: %3.3g s\n", toc);
     tic
 end
 
-pk = mex_stokes_dlp_pressure_grad_kspace(psrc,ptar,f,n,xi,eta,Mx,My,Lx,Ly,w,P);
+dpk = mex_stokes_dlp_pressure_grad_kspace(psrc,ptar,f,n,xi,eta,Mx,My,Lx,Ly,w,P);
 
 if verbose
     fprintf("TIME FOR FOURIER SUM: %3.3g s\n", toc);
     fprintf("*********************************************************\n\n");
 end
 
-p = -2*(pr + pk);
+dp = -2*(dpr + dpk);
 %p = pr + pk;
 
 end

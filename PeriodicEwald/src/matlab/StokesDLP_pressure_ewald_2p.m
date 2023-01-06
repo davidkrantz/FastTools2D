@@ -169,7 +169,7 @@ if ~isempty(equal_idx) > 0
     pself = xi^2*real(qsrc_c.*conj(nsrc_c))'/(2*pi);
 end
 
-p = pr + pk + pself;
+p = 2*(pr + pk + pself);
 
 end
 
