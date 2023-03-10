@@ -151,8 +151,8 @@ if verbose
     fprintf("*********************************************************\n\n");
 end
 
-dp = -2*(dpr + dpk);
-%p = pr + pk;
+%dp = -2*(dpr + dpk);
+dp = dpr + dpk; % this should be correct, matches manuscript
 
 end
 
